@@ -1,0 +1,10 @@
+// our patch - feedforward part
+adc => Gain g => DelayL d => PitShift p => dac;
+
+4095::samp => d.delay;
+0.5 => p.mix;
+5 => p.shift;
+1 => g.gain;
+
+// time loop
+while( true ) 100::ms => now;

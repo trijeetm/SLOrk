@@ -56,34 +56,38 @@ Shakers shake => JCRev r => dac;
 // set the reverb mix
 0.1 => r.mix;
 
+// root directory
+me.sourceDir() + "/" => string dirRoot;
+if( me.args() ) me.arg(0) => dirRoot;
+
+// sound buffers 
+6 => int nSamples;
+SndBuf samples[nSamples];
+
+["High 1_bip.aif", "High 2_bip.aif", "Low 1_bip.aif", "Low 2_bip.aif", "Mid 1_bip.aif", "Mid 2_bip.aif"] @=> string sampleFiles[];
+
+// load samples and chuck to dac
+for (0 => int i; i < nSamples; i++) {
+    dirRoot + sampleFiles[i] => string sampleSrc;
+    samples[i] => dac;
+    sampleSrc => samples[i].read;
+    0 => samples[i].rate;
+}
+
 0 => int instrument;
 
 // main loop
 while( true )
 {   
-    // loop all instruments
-    // instrument => shake.which;
-    // (instrument + 1) % 23 => instrument;
-
-    15 => shake.which;
-    Std.mtof(60) => shake.freq;
-    128 => shake.objects;
-    <<< "instrument #:", shake.which(), shake.freq(), shake.objects() >>>;
-
-
-    // shake it!
-    /*
-    if( gt.isButton == 1 )
-    {
-        <<< "shake!" >>>;  
-        0 => gt.isButton;    
-        Math.random2f( 0.8, 1.3 ) => shake.noteOn;
-    }
-    */
-
-    2.0 => shake.noteOn;
+    triggerPercussion(instrument);        
+    (instrument + 1) % nSamples => instrument;
 
     period => now;
+}
+
+fun void triggerPercussion(int id) {
+    1 => samples[id].rate;   
+    0 => samples[id].pos;
 }
 
 // print

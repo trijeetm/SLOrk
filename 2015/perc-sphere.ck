@@ -45,16 +45,14 @@ GameTrak gt;
 // spork control
 spork ~ gametrak();
 // print
-spork ~ print();
+// spork ~ print();
 
 // globals
-1000::ms => dur period;
+10::ms => dur period;
 
-Shakers shake => JCRev r => dac;
-// set the gain
-0.5 => r.gain;
+JCRev r;
 // set the reverb mix
-0.1 => r.mix;
+0.01 => r.mix;
 
 // root directory
 me.sourceDir() + "/" => string dirRoot;
@@ -66,26 +64,82 @@ SndBuf samples[nSamples];
 
 ["High 1_bip.aif", "High 2_bip.aif", "Low 1_bip.aif", "Low 2_bip.aif", "Mid 1_bip.aif", "Mid 2_bip.aif"] @=> string sampleFiles[];
 
+// percussion controls
+Gain percGain;
+1 => percGain.gain;
+
 // load samples and chuck to dac
 for (0 => int i; i < nSamples; i++) {
     dirRoot + sampleFiles[i] => string sampleSrc;
-    samples[i] => dac;
+    samples[i] => r => percGain => dac;
     sampleSrc => samples[i].read;
     0 => samples[i].rate;
 }
 
 0 => int instrument;
+-1 => int leftPerc;
+-1 => int rightPerc;
+
+0.35 => float triggerHeight;
+
+100 => int gainAmp;
 
 // main loop
 while( true )
 {   
-    triggerPercussion(instrument);        
-    (instrument + 1) % nSamples => instrument;
+    // right hand
+    if (gt.axis[5] > triggerHeight) {
+        if (gt.axis[4] < 0.01)
+            4 => rightPerc;
+        else {
+            if (gt.axis[3] >= 0.2)
+                2 => rightPerc;
+            else
+                0 => rightPerc;
+        }
+
+        <<< "right drum ", rightPerc, " ready!" >>>;
+    }
+    // trigger perc
+    if ((gt.axis[5] < triggerHeight) && (rightPerc >= 0)) {
+        Math.pow(((gt.lastAxis[5] - gt.axis[5]) * gainAmp), 1.5) => float gain;
+        <<< "velocity: ", gain >>>;
+        triggerPercussion(rightPerc, gain);
+        -2 => rightPerc;
+    }
+
+    // left hand
+    if (gt.axis[2] > triggerHeight) {
+        if (gt.axis[1] < 0.01)
+            5 => leftPerc;
+        else {
+            if (gt.axis[0] <= -0.2)
+                3 => leftPerc;
+            else
+                1 => leftPerc;
+        }
+
+        <<< "left drum ", leftPerc, " ready!" >>>;
+    }
+    // trigger perc
+    if ((gt.axis[2] < triggerHeight) && (leftPerc >= 0)) {
+        Math.pow(((gt.lastAxis[2] - gt.axis[2]) * gainAmp), 1.5) => float gain;
+        <<< "velocity: ", gain >>>;
+        triggerPercussion(leftPerc, gain);
+        -2 => leftPerc;
+    }
+
+    // if ((leftPerc < 0) && (rightPerc < 0))
+        // <<< "..." >>>;
 
     period => now;
 }
 
-fun void triggerPercussion(int id) {
+fun void triggerPercussion(int id, float gain) {
+    if (id < 0)
+        return;
+
+    gain => percGain.gain;
     1 => samples[id].rate;   
     0 => samples[id].pos;
 }

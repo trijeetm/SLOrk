@@ -22,31 +22,25 @@ if( !trak.openJoystick( device ) ) me.exit();
 // print
 <<< "joystick '" + trak.name() + "' ready", "" >>>;
 
-// set the reverb mix
-JCRev r;
-0.01 => r.mix;
 
 // root directory
 me.sourceDir() + "/" => string dirRoot;
 if( me.args() ) me.arg(0) => dirRoot;
 
 // sound buffers 
-6 => int nSamples;
+8 => int nSamples;
 SndBuf samples[nSamples];
 
-["High 1_bip.aif", "High 2_bip.aif", "Low 1_bip.aif", "Low 2_bip.aif", "Mid 1_bip.aif", "Mid 2_bip.aif"] @=> string sampleFiles[];
-
-// percussion controls
-Gain percGain;
-1 => percGain.gain;
-
-// load samples and chuck to dac
-for (0 => int i; i < nSamples; i++) {
-    dirRoot + sampleFiles[i] => string sampleSrc;
-    samples[i] => r => percGain => dac;
-    sampleSrc => samples[i].read;
-    0 => samples[i].rate;
-}
+[
+    "High 1_bip.aif",
+    "Mid 1_bip.aif",
+    "Low 1_bip.aif",
+    "Cym 1.aif",
+    "High 2_bip.aif",
+    "Low 2_bip.aif",
+    "Mid 2_bip.aif",
+    "Cym 2.aif"
+] @=> string sampleFiles[];
 
 // data structure for gametrak
 class GameTrak
@@ -74,9 +68,22 @@ maxLooperPeriod / Math.pow(2, maxLevels) => dur minLooperPeriod;
 class Percussor {
     int level;
     int instrument;
-    float gain;
     Gain g;
     JCRev r;
+    float gain;
+    float rmix;
+
+    fun void init(int channel) {
+        0 => g.gain;
+        0 => r.mix;
+        // load samples and chuck to dac
+        for (0 => int i; i < nSamples; i++) {
+            dirRoot + sampleFiles[i] => string sampleSrc;
+            samples[i] => r => g => dac.chan(channel);
+            sampleSrc => samples[i].read;
+            0 => samples[i].rate;
+        }
+    }
 
     fun void looper() {
         while (true) {
@@ -88,20 +95,19 @@ class Percussor {
                 maxLooperPeriod => period;
                 for (0 => int i; i < level; i++)
                     period / 2 => period;
-                triggerPercussion(instrument, gain);
+                triggerPercussion(instrument);
 
-                <<< "perc: (i, l, p, g)", instrument, level, period, gain >>>;
+                <<< "perc: (i, l, g, r)", instrument, level, gain, rmix >>>;
             }
 
             period => now;
         }
     }
 
-    fun void triggerPercussion(int id, float gain) {
+    fun void triggerPercussion(int id) {
         if (id < 0)
             return;
 
-        gain => percGain.gain;
         1 => samples[id].rate;   
         0 => samples[id].pos;
     }
@@ -117,6 +123,8 @@ class Percussor {
 Percussor leftPercussor;
 Percussor rightPercussor;
 
+leftPercussor.init(0);
+rightPercussor.init(1);
 
 // spork control
 spork ~ gametrak();
@@ -158,14 +166,20 @@ while( true )
     }
     else {
         if (gt.axis[4] > 0)
-            0 => rightPercussor.instrument;
+            6 => rightPercussor.instrument;
         else {
-            1 => rightPercussor.instrument;
+            7 => rightPercussor.instrument;
         }
     }
 
+// control parameters
+    Math.pow(Math.fabs(gt.axis[0]), 2) => leftPercussor.gain => leftPercussor.g.gain;
+    Math.pow(Math.fabs(gt.axis[3]), 2) => rightPercussor.gain => rightPercussor.g.gain;
+    Math.pow(Math.fabs(gt.axis[1]) * 0.25, 1) => leftPercussor.rmix => leftPercussor.r.mix;
+    Math.pow(Math.fabs(gt.axis[4]) * 0.25, 1) => rightPercussor.rmix => rightPercussor.r.mix;
+
 // level selector
-    0.075 => float zPerlevel;
+    0.1 => float zPerlevel;
     0 => int _level;
     // left hand
     0.1 => leftPercussor.gain;

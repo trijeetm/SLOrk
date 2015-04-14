@@ -6,9 +6,9 @@
 
 // ----------------------------------------------------
 // notes:
-// phones: -10
-// vol: ~min, low pass: 80
-// master: -40
+// phones: 0
+// vol: <-, low pass: 140
+// master: -10
 // ----------------------------------------------------
 
 // z axis deadzone
@@ -33,10 +33,6 @@ if( !trak.openJoystick( device ) ) me.exit();
 // root directory
 me.sourceDir() + "/" => string dirRoot;
 if( me.args() ) me.arg(0) => dirRoot;
-
-// sound buffers 
-8 => int nSamples;
-SndBuf samples[nSamples];
 
 [
     "High 1_bip.aif",
@@ -73,6 +69,19 @@ GameTrak gt;
 maxLooperPeriod / Math.pow(2, maxLevels) => dur minLooperPeriod;
 
 class Percussor {
+    // sound buffers 
+    8 => int nSamples;
+    SndBuf bassSamples[nSamples];
+    SndBuf hemiSamples1[nSamples];
+    Gain hemiSamples1Gain;
+    0 => hemiSamples1Gain.gain;
+    SndBuf hemiSamples2[nSamples];
+    Gain hemiSamples2Gain;
+    0 => hemiSamples2Gain.gain;
+    
+    Math.random2(0, 1) => int speaker;
+    
+    // data members
     int level;
     int instrument;
     Gain g[nSamples];
@@ -80,24 +89,33 @@ class Percussor {
     float gain[nSamples];
     float rmix[nSamples];
 
-fun void init(int channel) {
+fun void init(int c1, int c2) {
         // load samples and chuck to dac
         for (0 => int i; i < nSamples; i++) {
             0 => g[i].gain;
             0 => r[i].mix;
-            .1 => r[i].gain;
+            .15 => r[i].gain;
             dirRoot + sampleFiles[i] => string sampleSrc;
+            
+            sampleSrc => bassSamples[i].read;
+            0 => bassSamples[i].rate;
+            
+            sampleSrc => hemiSamples1[i].read;
+            0 => hemiSamples1[i].rate;
+            
+            sampleSrc => hemiSamples2[i].read;
+            0 => hemiSamples2[i].rate;
+            
             // bass channel
-            if (channel < 4)
-                samples[i] => r[i] => g[i] => dac.chan(1);
+            if (c1 < 3)
+                bassSamples[i] => r[i] => g[i] => dac.chan(1);
             else
-                samples[i] => r[i] => g[i] => dac.chan(0); 
+                bassSamples[i] => r[i] => g[i] => dac.chan(0); 
                 
             // hemi channels
-            samples[i] => r[i] => g[i] => dac.chan(channel);
-            // samples[i] => r[i] => g[i] => dac.chan(channel + 1);
-            sampleSrc => samples[i].read;
-            0 => samples[i].rate;
+            hemiSamples1[i] => r[i] => g[i] => hemiSamples1Gain => dac.chan(c1);
+            hemiSamples2[i] => r[i] => g[i] => hemiSamples2Gain => dac.chan(c2);
+            
         }
     }
 
@@ -112,8 +130,6 @@ fun void init(int channel) {
                 for (0 => int i; i < level; i++)
                     period / 2 => period;
                 triggerPercussion(instrument);
-
-                <<< "perc: (i, l, g, r)", instrument, level, gain[instrument], rmix[instrument] >>>;
             }
 
             period => now;
@@ -124,8 +140,21 @@ fun void init(int channel) {
         if (id < 0)
             return;
 
-        1 => samples[id].rate;   
-        0 => samples[id].pos;
+        1 => bassSamples[id].rate;   
+        0 => bassSamples[id].pos;
+        
+        (speaker + 1) % 2 => speaker;
+        if (speaker == 0) {
+            0.5 => hemiSamples1Gain.gain;
+            0.05 => hemiSamples2Gain.gain;
+        }
+        else {
+            0.05 => hemiSamples1Gain.gain;
+            0.5 => hemiSamples2Gain.gain;
+        }
+        
+        <<< "perc: (i, l, g, r, s)", instrument, level, gain[instrument], rmix[instrument], speaker >>>;
+
     }
 
     fun void updateLevel(int lev) {
@@ -139,8 +168,8 @@ fun void init(int channel) {
 Percussor leftPercussor;
 Percussor rightPercussor;
 
-leftPercussor.init(4);
-rightPercussor.init(2);
+leftPercussor.init(4, 5);
+rightPercussor.init(2, 3);
 
 // spork control
 spork ~ gametrak();

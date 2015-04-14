@@ -75,26 +75,27 @@ maxLooperPeriod / Math.pow(2, maxLevels) => dur minLooperPeriod;
 class Percussor {
     int level;
     int instrument;
-    Gain g;
-    NRev r;
-    float gain;
-    float rmix;
+    Gain g[nSamples];
+    NRev r[nSamples];
+    float gain[nSamples];
+    float rmix[nSamples];
 
-    fun void init(int channel) {
-        0 => g.gain;
-        0 => r.mix;
-        .1 => r.gain;
+fun void init(int channel) {
         // load samples and chuck to dac
         for (0 => int i; i < nSamples; i++) {
+            0 => g[i].gain;
+            0 => r[i].mix;
+            .1 => r[i].gain;
             dirRoot + sampleFiles[i] => string sampleSrc;
             // bass channel
-            if (channel < 3)
-                samples[i] => r => g => dac.chan(0);
-            else 
-                samples[i] => r => g => dac.chan(1);
+            if (channel < 4)
+                samples[i] => r[i] => g[i] => dac.chan(1);
+            else
+                samples[i] => r[i] => g[i] => dac.chan(0); 
+                
             // hemi channels
-            // samples[i] => r => g => dac.chan(channel);
-            // samples[i] => r => g => dac.chan(channel + 1);
+            samples[i] => r[i] => g[i] => dac.chan(channel);
+            // samples[i] => r[i] => g[i] => dac.chan(channel + 1);
             sampleSrc => samples[i].read;
             0 => samples[i].rate;
         }
@@ -112,7 +113,7 @@ class Percussor {
                     period / 2 => period;
                 triggerPercussion(instrument);
 
-                <<< "perc: (i, l, g, r)", instrument, level, gain, rmix >>>;
+                <<< "perc: (i, l, g, r)", instrument, level, gain[instrument], rmix[instrument] >>>;
             }
 
             period => now;
@@ -138,8 +139,8 @@ class Percussor {
 Percussor leftPercussor;
 Percussor rightPercussor;
 
-leftPercussor.init(3);
-rightPercussor.init(5);
+leftPercussor.init(4);
+rightPercussor.init(2);
 
 // spork control
 spork ~ gametrak();
@@ -188,12 +189,12 @@ while( true )
     }
 
 // control parameters
-    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 0.5, 1) + 0.2 => leftPercussor.gain => leftPercussor.g.gain;
-    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 0.5, 1) + 0.2 => rightPercussor.gain => rightPercussor.g.gain;
-    0 => float revRange;
+    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 1, 1) + 0.5 => leftPercussor.gain[leftPercussor.instrument] => leftPercussor.g[leftPercussor.instrument].gain;
+    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 1, 1) + 0.5 => rightPercussor.gain[rightPercussor.instrument] => rightPercussor.g[rightPercussor.instrument].gain;
+    0.2 => float revRange;
     0.01 => float minRev;
-    minRev + Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix => leftPercussor.r.mix;
-    minRev + Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix => rightPercussor.r.mix;
+    minRev + Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix[leftPercussor.instrument] => leftPercussor.r[leftPercussor.instrument].mix;
+    minRev + Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix[rightPercussor.instrument] => rightPercussor.r[rightPercussor.instrument].mix;
 
 // level selector
     0.1 => float zPerlevel;

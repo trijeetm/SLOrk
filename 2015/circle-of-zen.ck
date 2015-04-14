@@ -83,15 +83,18 @@ class Percussor {
     fun void init(int channel) {
         0 => g.gain;
         0 => r.mix;
-        1 => r.gain;
+        .1 => r.gain;
         // load samples and chuck to dac
         for (0 => int i; i < nSamples; i++) {
             dirRoot + sampleFiles[i] => string sampleSrc;
-            // assign sample to channel given
-            samples[i] => r => g => dac.chan(channel);
-            // assign sample to subwoofer
-            // samples[i] => r => g => dac.chan(6);
-            // samples[i] => r => g => dac.chan(7);
+            // bass channel
+            if (channel < 3)
+                samples[i] => r => g => dac.chan(0);
+            else 
+                samples[i] => r => g => dac.chan(1);
+            // hemi channels
+            // samples[i] => r => g => dac.chan(channel);
+            // samples[i] => r => g => dac.chan(channel + 1);
             sampleSrc => samples[i].read;
             0 => samples[i].rate;
         }
@@ -135,8 +138,8 @@ class Percussor {
 Percussor leftPercussor;
 Percussor rightPercussor;
 
-leftPercussor.init(0);
-rightPercussor.init(1);
+leftPercussor.init(3);
+rightPercussor.init(5);
 
 // spork control
 spork ~ gametrak();
@@ -185,12 +188,12 @@ while( true )
     }
 
 // control parameters
-    Math.pow(Math.fabs(gt.axis[0]) * 0.6, 2) + 0.1 => leftPercussor.gain => leftPercussor.g.gain;
-    Math.pow(Math.fabs(gt.axis[3]) * 0.6, 2) + 0.1 => rightPercussor.gain => rightPercussor.g.gain;
-    0.3 => float revRange;
-    0.05 => float minRev;
-    minRev + revRange - Math.pow(Math.fabs(gt.axis[1]) * revRange, 1) => leftPercussor.rmix => leftPercussor.r.mix;
-    minRev + revRange - Math.pow(Math.fabs(gt.axis[4]) * revRange, 1) => rightPercussor.rmix => rightPercussor.r.mix;
+    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 0.5, 1) + 0.2 => leftPercussor.gain => leftPercussor.g.gain;
+    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 0.5, 1) + 0.2 => rightPercussor.gain => rightPercussor.g.gain;
+    0 => float revRange;
+    0.01 => float minRev;
+    minRev + Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix => leftPercussor.r.mix;
+    minRev + Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix => rightPercussor.r.mix;
 
 // level selector
     0.1 => float zPerlevel;

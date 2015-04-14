@@ -1,11 +1,18 @@
-// name: gametra.ck
-// desc: gametrak boilerplate example
+// ----------------------------------------------------
+// name: circle of zen
 //
-// author: Ge Wang (ge@ccrma.stanford.edu)
-// date: summer 2014
+// author: Trijeet Mukhopadhyay (trijeetm@stanford.edu)
+// ----------------------------------------------------
+
+// ----------------------------------------------------
+// notes:
+// phones: -10
+// vol: ~min, low pass: 80
+// master: -40
+// ----------------------------------------------------
 
 // z axis deadzone
-0 => float DEADZONE;
+0.05 => float DEADZONE;
 
 // which joystick
 0 => int device;
@@ -61,25 +68,30 @@ class GameTrak
 // gametrack
 GameTrak gt;
 
-4000::ms => dur maxLooperPeriod;
-5 => int maxLevels;
+6000::ms => dur maxLooperPeriod;
+6 => int maxLevels;
 maxLooperPeriod / Math.pow(2, maxLevels) => dur minLooperPeriod;
 
 class Percussor {
     int level;
     int instrument;
     Gain g;
-    JCRev r;
+    NRev r;
     float gain;
     float rmix;
 
     fun void init(int channel) {
         0 => g.gain;
         0 => r.mix;
+        1 => r.gain;
         // load samples and chuck to dac
         for (0 => int i; i < nSamples; i++) {
             dirRoot + sampleFiles[i] => string sampleSrc;
+            // assign sample to channel given
             samples[i] => r => g => dac.chan(channel);
+            // assign sample to subwoofer
+            // samples[i] => r => g => dac.chan(6);
+            // samples[i] => r => g => dac.chan(7);
             sampleSrc => samples[i].read;
             0 => samples[i].rate;
         }
@@ -139,7 +151,7 @@ spork ~ rightPercussor.looper();
 
 // main loop
 while( true )
-{  
+{      
 // instrument selector
     // left hand
     if (gt.axis[0] > 0) {
@@ -173,20 +185,20 @@ while( true )
     }
 
 // control parameters
-    Math.pow(Math.fabs(gt.axis[0]), 2) => leftPercussor.gain => leftPercussor.g.gain;
-    Math.pow(Math.fabs(gt.axis[3]), 2) => rightPercussor.gain => rightPercussor.g.gain;
-    Math.pow(Math.fabs(gt.axis[1]) * 0.25, 1) => leftPercussor.rmix => leftPercussor.r.mix;
-    Math.pow(Math.fabs(gt.axis[4]) * 0.25, 1) => rightPercussor.rmix => rightPercussor.r.mix;
+    Math.pow(Math.fabs(gt.axis[0]) * 0.6, 2) + 0.1 => leftPercussor.gain => leftPercussor.g.gain;
+    Math.pow(Math.fabs(gt.axis[3]) * 0.6, 2) + 0.1 => rightPercussor.gain => rightPercussor.g.gain;
+    0.3 => float revRange;
+    0.05 => float minRev;
+    minRev + revRange - Math.pow(Math.fabs(gt.axis[1]) * revRange, 1) => leftPercussor.rmix => leftPercussor.r.mix;
+    minRev + revRange - Math.pow(Math.fabs(gt.axis[4]) * revRange, 1) => rightPercussor.rmix => rightPercussor.r.mix;
 
 // level selector
     0.1 => float zPerlevel;
     0 => int _level;
     // left hand
-    0.1 => leftPercussor.gain;
     (gt.axis[2] / zPerlevel) $ int => _level;
     leftPercussor.updateLevel(_level);
     // right hand
-    0.1 => rightPercussor.gain;
     (gt.axis[5] / zPerlevel) $ int => _level;
     rightPercussor.updateLevel(_level);
 

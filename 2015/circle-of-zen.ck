@@ -7,12 +7,12 @@
 // ----------------------------------------------------
 // notes:
 // phones: 0
-// vol: <-, low pass: 140
+// vol: 0.5, low pass: 140
 // master: -10
 // ----------------------------------------------------
 
 // z axis deadzone
-0.05 => float DEADZONE;
+0.02 => float DEADZONE;
 
 // which joystick
 0 => int device;
@@ -218,15 +218,15 @@ while( true )
     }
 
 // control parameters
-    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 1, 1) + 0.5 => leftPercussor.gain[leftPercussor.instrument] => leftPercussor.g[leftPercussor.instrument].gain;
-    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 1, 1) + 0.5 => rightPercussor.gain[rightPercussor.instrument] => rightPercussor.g[rightPercussor.instrument].gain;
+    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 1.5, 1) + 0.1 => leftPercussor.gain[leftPercussor.instrument] => leftPercussor.g[leftPercussor.instrument].gain;
+    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 1.5, 1) + 0.1 => rightPercussor.gain[rightPercussor.instrument] => rightPercussor.g[rightPercussor.instrument].gain;
     0.2 => float revRange;
-    0.01 => float minRev;
-    minRev + Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix[leftPercussor.instrument] => leftPercussor.r[leftPercussor.instrument].mix;
-    minRev + Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix[rightPercussor.instrument] => rightPercussor.r[rightPercussor.instrument].mix;
+    0.05 => float minRev;
+    minRev + revRange - Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix[leftPercussor.instrument] => leftPercussor.r[leftPercussor.instrument].mix;
+    minRev + revRange - Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix[rightPercussor.instrument] => rightPercussor.r[rightPercussor.instrument].mix;
 
 // level selector
-    0.1 => float zPerlevel;
+    0.08 => float zPerlevel;
     0 => int _level;
     // left hand
     (gt.axis[2] / zPerlevel) $ int => _level;

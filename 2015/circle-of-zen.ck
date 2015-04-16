@@ -153,7 +153,8 @@ fun void init(int c1, int c2) {
             0.5 => hemiSamples2Gain.gain;
         }
         
-        <<< "perc: (i, l, g, r, s)", instrument, level, gain[instrument], rmix[instrument], speaker >>>;
+        // <<< "perc: (i, l, g, r, s)", instrument, level, gain[instrument], rmix[instrument], speaker >>>;
+        <<< "level: ", level >>>;
 
     }
 
@@ -218,12 +219,12 @@ while( true )
     }
 
 // control parameters
-    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 1.5, 1) + 0.1 => leftPercussor.gain[leftPercussor.instrument] => leftPercussor.g[leftPercussor.instrument].gain;
-    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 1.5, 1) + 0.1 => rightPercussor.gain[rightPercussor.instrument] => rightPercussor.g[rightPercussor.instrument].gain;
-    0.2 => float revRange;
-    0.05 => float minRev;
-    minRev + revRange - Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix[leftPercussor.instrument] => leftPercussor.r[leftPercussor.instrument].mix;
-    minRev + revRange - Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix[rightPercussor.instrument] => rightPercussor.r[rightPercussor.instrument].mix;
+    Math.pow(Math.fabs(gt.axis[0] * 100) / 100 * 1.5, 1) + 0.2 => leftPercussor.gain[leftPercussor.instrument] => leftPercussor.g[leftPercussor.instrument].gain;
+    Math.pow(Math.fabs(gt.axis[3] * 100) / 100 * 1.5, 1) + 0.2 => rightPercussor.gain[rightPercussor.instrument] => rightPercussor.g[rightPercussor.instrument].gain;
+    0.18 => float revRange;
+    0.02 => float minRev;
+    minRev + Math.pow(Math.fabs(gt.axis[1] * 100) / 100 * revRange, 1) => leftPercussor.rmix[leftPercussor.instrument] => leftPercussor.r[leftPercussor.instrument].mix;
+    minRev + Math.pow(Math.fabs(gt.axis[4] * 100) / 100 * revRange, 1) => rightPercussor.rmix[rightPercussor.instrument] => rightPercussor.r[rightPercussor.instrument].mix;
 
 // level selector
     0.08 => float zPerlevel;

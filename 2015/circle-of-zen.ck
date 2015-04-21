@@ -129,7 +129,9 @@ fun void init(int c1, int c2) {
                 maxLooperPeriod => period;
                 for (0 => int i; i < level; i++)
                     period / 2 => period;
-                triggerPercussion(instrument);
+                if (gt.isButton == 0)
+                    triggerPercussion(instrument);
+                <<< "level: ", level >>>;
             }
 
             period => now;
@@ -154,7 +156,7 @@ fun void init(int c1, int c2) {
         }
         
         // <<< "perc: (i, l, g, r, s)", instrument, level, gain[instrument], rmix[instrument], speaker >>>;
-        <<< "level: ", level >>>;
+        
 
     }
 

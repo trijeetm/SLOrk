@@ -49,11 +49,16 @@ fun void network()
     }
 }
 
+0.9 => float prob;
+
 fun void play(float pitch, float velocity) {
     // set pitch
     pitch => Std.mtof => k.freq;
-    // pluck it
-    velocity => k.noteOn;
+
+    if (Math.random2f(0, 1) < prob) {
+        // pluck it
+        velocity => k.noteOn;
+    }
 }
 
 // network

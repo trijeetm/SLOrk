@@ -1,6 +1,6 @@
 // Notes: Also include "playDrums", "playBass", "playBowed" functions
 
-200::ms => int TEMPO;
+200::ms => dur TEMPO;
 
 // osc port
 6449 => int OSC_PORT;

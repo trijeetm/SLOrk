@@ -42,13 +42,18 @@ fun void network()
                 // log
                 <<< "RECV pitch:", pitch, "velocity:", velocity >>>;
                 
-                // set pitch
-                pitch => Std.mtof => k.freq;
-                // pluck it
-                velocity => k.noteOn;
+
+                play(pitch, velocity);
             }
         }
     }
+}
+
+fun void play(float pitch, float velocity) {
+    // set pitch
+    pitch => Std.mtof => k.freq;
+    // pluck it
+    velocity => k.noteOn;
 }
 
 // network

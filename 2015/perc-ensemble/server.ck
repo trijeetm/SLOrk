@@ -1,5 +1,7 @@
 // Notes: Also include "playDrums", "playBass", "playBowed" functions
 
+200::ms => int TEMPO;
+
 // osc port
 6449 => int OSC_PORT;
 
@@ -66,5 +68,5 @@ while( true )
     playAll( 48, .05 );
     
     // wait
-    500::ms => now;
+    TEMPO => now;
 }

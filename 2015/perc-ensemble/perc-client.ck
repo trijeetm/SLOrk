@@ -8,6 +8,42 @@ instrument:
     dont know how we're synthesizing
 */
 
+// the device number to open
+0 => int deviceNum;
+
+// instantiate a HidIn object
+HidIn hi;
+// structure to hold HID messages
+HidMsg msg;
+
+// open keyboard
+if( !hi.openKeyboard( deviceNum ) ) me.exit();
+// successful! print name of device
+<<< "keyboard '", hi.name(), "' ready" >>>;
+
+// infinite event loop
+while( true )
+{
+    // wait on event
+    hi => now;
+    
+    // get one or more messages
+    while( hi.recv( msg ) )
+    {
+        // check for action type
+        if( msg.isButtonDown() )
+        {
+            // print
+            <<< "down:", msg.which >>>;
+        }
+        else
+        {
+            // print
+            <<< "up:", msg.which >>>;
+        }
+    }
+}
+
 // osc port
 6449 => int OSC_PORT;
 

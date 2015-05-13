@@ -1,4 +1,12 @@
-// I make change again
+/*
+TODO:
+controls:
+    probability
+    volume
+    reverb
+instrument:
+    dont know how we're synthesizing
+*/
 
 // osc port
 6449 => int OSC_PORT;

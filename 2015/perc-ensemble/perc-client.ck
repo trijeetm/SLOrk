@@ -21,25 +21,59 @@ if( !hi.openKeyboard( deviceNum ) ) me.exit();
 // successful! print name of device
 <<< "keyboard '", hi.name(), "' ready" >>>;
 
-// infinite event loop
-while( true )
-{
-    // wait on event
-    hi => now;
-    
-    // get one or more messages
-    while( hi.recv( msg ) )
+// perc controls
+0 => float prob;
+0 => float clientGain;
+
+spork ~ handleKeyboard();
+
+fun void handleKeyboard() {
+    // infinite event loop
+    while( true )
     {
-        // check for action type
-        if( msg.isButtonDown() )
+        // wait on event
+        hi => now;
+        
+        // get one or more messages
+        while( hi.recv( msg ) )
         {
-            // print
-            <<< "down:", msg.which >>>;
-        }
-        else
-        {
-            // print
-            <<< "up:", msg.which >>>;
+            // check for action type
+            if( msg.isButtonDown() )
+            {
+                // print
+                // <<< "down:", msg.which >>>;
+
+                msg.which => int key;
+
+                // prob
+                if (key == 48) {
+                    if (prob < 1) {
+                        0.05 + prob => prob;
+                    }
+                }
+                if (key == 47) {
+                    if (prob > 0) {
+                        prob - 0.05 => prob;
+                    }
+                }
+
+                // gain
+                if (key == 46) {
+                    if (clientGain < 2) {
+                        0.025 + clientGain => clientGain;
+                    }
+                }
+                if (key == 45) {
+                    if (clientGain > 0) {
+                        clientGain - 0.025 => clientGain;
+                    }
+                }
+            }
+            else
+            {
+                // print
+                // <<< "up:", msg.which >>>;
+            }
         }
     }
 }
@@ -47,7 +81,7 @@ while( true )
 // osc port
 6449 => int OSC_PORT;
 
-StifKarp k => NRev r => dac;
+StifKarp k => NRev r => Gain g => dac;
 .1 => r.mix;
 
 // OSC
@@ -76,7 +110,7 @@ fun void network()
                 omsg.getFloat(1) => float velocity;
                 
                 // log
-                <<< "RECV pitch:", pitch, "velocity:", velocity >>>;
+                // <<< "RECV pitch:", pitch, "velocity:", velocity >>>;
                 
 
                 play(pitch, velocity);
@@ -85,11 +119,13 @@ fun void network()
     }
 }
 
-0.9 => float prob;
-
 fun void play(float pitch, float velocity) {
+    <<< velocity, prob >>>;
+    
     // set pitch
     pitch => Std.mtof => k.freq;
+
+    clientGain => g.gain;
 
     if (Math.random2f(0, 1) < prob) {
         // pluck it

@@ -68,6 +68,13 @@ fun void handleKeyboard() {
                         clientGain - 0.025 => clientGain;
                     }
                 }
+                
+                if( key == 30 ) 0.0 => clientgain;
+                if( key == 31 ) 0.1 => clientgain;
+                if( key == 32 ) 0.3 => clientgain;
+                if( key == 33 ) 0.6 => clientgain;
+                if( key == 34 ) 1.0 => clientgain;
+                
             }
             else
             {

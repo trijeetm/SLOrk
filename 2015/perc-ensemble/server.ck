@@ -1,3 +1,5 @@
+// Notes: Also include "playDrums", "playBass", "playBowed" functions
+
 // osc port
 6449 => int OSC_PORT;
 

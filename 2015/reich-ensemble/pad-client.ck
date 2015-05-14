@@ -48,11 +48,11 @@ fun void network()
 
 SinOsc sin => Gain g => Chorus c => NRev r => dac;
 5 => c.modFreq;
-0.03 => c.modDepth;
-0 => c.mix;
+0 => c.modDepth;
+1 => c.mix;
 
 0 => float clientGain;
-0 => int vibrato;
+0 => int mute;
 
 fun void play (float pitch, float velocity) {
     
@@ -133,9 +133,9 @@ fun void gametrak()
                     }
                 }
             } else if (msg.isButtonDown()) {
-                1 => vibrato;
+                1 => mute;
             } else if (msg.isButtonUp()) {
-                0 => vibrato;
+                0 => mute;
             }
         }
     }
@@ -161,10 +161,13 @@ while( true ) {
         0 => r.mix;
     }
     
-    if (vibrato == 1) {
-        1 => c.mix;
-    } else {
-        0 => c.mix;
+    if (gt.axis[5] > 0.1) {
+        (gt.axis[5] - 0.1) * 0.1 => c.modDepth;
+        <<< (gt.axis[5] - 0.1) * 0.1 >>>;
+    }
+    
+    if (mute == 1) {
+        0 => g.gain;
     }
         
     

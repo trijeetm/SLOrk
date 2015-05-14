@@ -1,6 +1,6 @@
 // Notes: Also include "playDrums", "playBass", "playBowed" functions
 
-200::ms => dur TEMPO;
+240::ms => dur TEMPO;
 
 // osc port
 6449 => int OSC_PORT;
@@ -38,7 +38,7 @@ for( int i; i < HOSTS.size(); i++ )
 }
 
 // play
-fun void play( int host, float pitch, float velocity )
+fun void play( int host, float pitch, float master, int nBeats, int count )
 {
     // sanity check
     if( host < 0 || host >= XMIT.size() )
@@ -48,24 +48,33 @@ fun void play( int host, float pitch, float velocity )
     XMIT[host].start( "/slork/play" );
     // add parameters to be sent
     XMIT[host].add( pitch );
-    XMIT[host].add( velocity );
+    XMIT[host].add( master );
+    XMIT[host].add( nBeats );
+    XMIT[host].add( count );
     // fire!
     XMIT[host].send();
 }
 
 // play all
-fun void playAll( float pitch, float velocity )
+fun void playAll( float pitch, float master, int nBeats, int count )
 {
     for( int i; i < XMIT.size(); i++ )
     {
-        play( i, pitch, velocity );
+        play( i, pitch, master, nBeats, count );
     }
 }
 
+0 => int count;
+
 while( true )
 {
-    // call (pitch, velocity)
-    playAll( 48, .05 );
+    8 => int nBeats;
+
+    playAll( 48, 1, nBeats, count );
+
+    (count + 1) % nBeats => count;
+
+    <<< count >>>;
     
     // wait
     TEMPO => now;

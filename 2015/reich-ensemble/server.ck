@@ -1,3 +1,18 @@
+// the device number to open
+0 => int deviceNum;
+
+// instantiate a HidIn object
+HidIn hi;
+// structure to hold HID messages
+HidMsg msg;
+
+// open keyboard
+if( !hi.openKeyboard( deviceNum ) ) me.exit();
+// successful! print name of device
+<<< "keyboard '", hi.name(), "' ready" >>>;
+
+spork ~ handleKeyboard();
+
 // Notes: Also include "playDrums", "playBass", "playBowed" functions
 
 200::ms => dur TEMPO;
@@ -12,13 +27,26 @@ string HOSTS[0];
 if( HOSTS.size() == 0 )
 {
     HOSTS << "localhost";
-    // HOSTS << "foiegras.local";
-    // HOSTS << "lasagna.local";
+
+    /*
+    HOSTS << "gelato.local";
+    HOSTS << "foiegras.local";
+    HOSTS << "kimchi.local";
+    HOSTS << "lasagna.local";
     // HOSTS << "chowder.local";
-    // HOSTS << "hamburger.local";
-    // HOSTS << "icetea.local";
-    // HOSTS << "empanada.local";
+    HOSTS << "hamburger.local";
+    HOSTS << "icetea.local";
+    HOSTS << "empanada.local";
     // HOSTS << "albacore.local";
+    HOSTS << "nachos.local";
+    
+    HOSTS << "omelet.local";
+    HOSTS << "xanax.local";
+    HOSTS << "banhmi.local";
+    HOSTS << "spam.local";
+    HOSTS << "peanutbutter.local";
+    HOSTS << "jambalaya.local";
+    */
 }
 
 // number of targets
@@ -65,17 +93,77 @@ fun void playAll( float pitch, float master, int nBeats, int count )
 }
 
 0 => int count;
+48 => float pitch;
 
 while( true )
 {
     8 => int nBeats;
 
-    playAll( 48, 1, nBeats, count );
+    playAll( pitch, 1, nBeats, count );
 
     (count + 1) % nBeats => count;
 
-    <<< count >>>;
+    <<< TEMPO, count >>>;
     
     // wait
     TEMPO => now;
+}
+
+fun void handleKeyboard() {
+    // infinite event loop
+    while( true )
+    {
+        // wait on event
+        hi => now;
+        
+        // get one or more messages
+        while( hi.recv( msg ) )
+        {
+            // check for action type
+            if( msg.isButtonDown() )
+            {
+                // print
+                // <<< "down:", msg.which >>>;
+
+                msg.which => int key;
+
+                // note selector
+                if (key == 30) {
+                    48 => pitch;
+                }
+                if (key == 31) {
+                    48 + 5 => pitch;
+                }
+                if (key == 32) {
+                    48 + 7 => pitch;
+                }
+                if (key == 33) {
+                    48 + 11 => pitch;
+                }
+                if (key == 34) {
+                    48 + 12 => pitch;
+                }
+                /*
+                */
+                
+                // tempo
+                if (key == 46) {
+                    if (TEMPO < 300::ms) {
+                        5::ms + TEMPO => TEMPO;
+                    }
+                }
+                if (key == 45) {
+                    if (TEMPO > 180::ms) {
+                        TEMPO - 5::ms => TEMPO;
+                    }
+                }
+
+            }
+            else
+            {
+                // print
+                // <<< "up:", msg.which >>>;
+            }
+        }
+    }
 }

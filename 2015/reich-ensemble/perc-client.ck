@@ -123,6 +123,7 @@ fun void network()
 
 fun void play(float pitch) {
     <<< "-----------------------------------    " >>>;
+    <<< "Controls:                              " >>>;
     <<< "-----------------------------------    " >>>;
     <<< "1 2 3 4 5 : Select instrument          " >>>;
     <<< ", . /     : Select beat                " >>>;
@@ -130,7 +131,7 @@ fun void play(float pitch) {
     <<< "- +       : Volume down / up           " >>>;
     <<< "z x       : Reverb down / up           " >>>;
     <<< "-----------------------------------    " >>>;
-    <<< "Period:  Prob:   Gain:    Reverb:      " >>>;
+    <<< " Prob:    Gain:    Reverb:             " >>>;
 
     for (0 => int i; i < nSamples; i++) {
         <<< "------------------------               " >>>;

@@ -44,7 +44,8 @@ spork ~ handleKeyboard();
 // percussion control
 Gain masterGain;
 0 => int instrument;
-float percProbabilities[nSamples];
+0 => int beatPeriod;
+float percProbabilities[nSamples][3];
 Gain percGains[nSamples];
 NRev percRev[nSamples];
 
@@ -52,7 +53,8 @@ NRev percRev[nSamples];
 SndBuf percSamples[nSamples];
 
 for (0 => int i; i < nSamples; i++) {
-    0 => percProbabilities[i];
+    for (0 => int j; j < 3; j++)
+        0 => percProbabilities[i][j];
     0 => percGains[i].gain;
     0 => percRev[i].mix;
 
@@ -120,35 +122,49 @@ fun void network()
 }
 
 fun void play(float pitch) {
-    <<< "--------------------------    " >>>;
-    <<< "Prob:   Gain:    Reverb:      " >>>;
+    <<< "-----------------------------------    " >>>;
+    <<< "-----------------------------------    " >>>;
+    <<< "1 2 3 4 5 : Select instrument          " >>>;
+    <<< ", . /     : Select beat                " >>>;
+    <<< "[ ]       : Probability down / up      " >>>;
+    <<< "- +       : Volume down / up           " >>>;
+    <<< "z x       : Reverb down / up           " >>>;
+    <<< "-----------------------------------    " >>>;
+    <<< "Period:  Prob:   Gain:    Reverb:      " >>>;
 
     for (0 => int i; i < nSamples; i++) {
-        percProbabilities[i] => float prob;
-        percGains[i].gain() => float _gain;
+        <<< "------------------------               " >>>;
+        for (0 => int j; j < 3; j++) {
+            percProbabilities[i][j] => float prob;
+            percGains[i].gain() => float _gain;
 
-        <<< prob, percGains[i].gain(), percRev[i].mix() >>>;
+            <<< j, prob, percGains[i].gain(), percRev[i].mix() >>>;
 
-        if (count == 0) {
-            percProbabilities[i] * 4 => prob;            
-            _gain * Math.random2f(1.9, 2.1) => percGains[i].gain;
-        }
-        else if (count == (nBeats / 2)) {
-            percProbabilities[i] * 2 => prob;
-            _gain * Math.random2f(1.5, 1.7) => percGains[i].gain;
-        }
-        else if (count == (nBeats / 4)) {
-            _gain * Math.random2f(1.25, 1.4) => percGains[i].gain;
-        }
-        else {
-            _gain * Math.random2f(0.75, 1.2) => percGains[i].gain;
-        }
+            if (count == 0) {
+                percProbabilities[i][j] * 4 => prob;            
+                _gain * Math.random2f(1.9, 2.1) => percGains[i].gain;
+            }
+            else if (count == (nBeats / 2)) {
+                percProbabilities[i][j] * 2 => prob;
+                _gain * Math.random2f(1.5, 1.7) => percGains[i].gain;
+            }
+            else if (count == (nBeats / 4)) {
+                _gain * Math.random2f(1.25, 1.4) => percGains[i].gain;
+            }
+            else {
+                _gain * Math.random2f(0.75, 1.2) => percGains[i].gain;
+            }
 
-        if (Math.random2f(0, 1) < prob) {
-            playPerc(i);
-        }
+            //<<< (nBeats / Math.pow(2, j)) >>>;
+            if ((j == 2) || (count % (nBeats / Math.pow(2, j)) == 0)) {
+                // <<< count >>>;
+                if (Math.random2f(0, 1) < prob) {
+                    playPerc(i);
+                }
+            }
 
-        _gain => percGains[i].gain;
+            _gain => percGains[i].gain;
+        }
     }
 }
 
@@ -189,6 +205,17 @@ fun void handleKeyboard() {
                 /*
                 */
 
+                // period selector
+                if (key == 54) {
+                    0 => beatPeriod;
+                }
+                if (key == 55) {
+                    1 => beatPeriod;
+                }
+                if (key == 56) {
+                    2 => beatPeriod;
+                }
+
                 // rev
                 if (key == 29) {
                     if (percRev[instrument].mix() > 0) {
@@ -203,13 +230,13 @@ fun void handleKeyboard() {
 
                 // prob
                 if (key == 48) {
-                    if (percProbabilities[instrument] < 1) {
-                        0.025 + percProbabilities[instrument] => percProbabilities[instrument];
+                    if (percProbabilities[instrument][beatPeriod] < 1) {
+                        0.025 + percProbabilities[instrument][beatPeriod] => percProbabilities[instrument][beatPeriod];
                     }
                 }
                 if (key == 47) {
-                    if (percProbabilities[instrument] > 0) {
-                        percProbabilities[instrument] - 0.025 => percProbabilities[instrument];
+                    if (percProbabilities[instrument][beatPeriod] > 0) {
+                        percProbabilities[instrument][beatPeriod] - 0.025 => percProbabilities[instrument][beatPeriod];
                     }
                 }
 

@@ -42,18 +42,20 @@ fun void network()
     }
 }
 
-///////////////////////
-// INSTRUMENT SOUNDS //
-///////////////////////
+//////////////////////
+// INSTRUMENT UGENS //
+//////////////////////
 
 SinOsc osc1 => Gain g => Chorus c => NRev r => dac;
 TriOsc osc2 => g;
 
 1 => g.gain;
-5 => c.modFreq;
+3 => c.modFreq;
 0 => c.modDepth;
-1 => c.mix;
+0.5 => c.mix;
+0.1 => r.mix;
 
+// These will be controlled by the gametrak
 0 => float clientGain;
 20 => float clientPitch;
 0 => int vibrato;
@@ -148,9 +150,9 @@ fun void gametrak()
 }
 
 
-////////////////////////
-// QUADRANT-TO-OUTPUT // (for Gametrak)
-////////////////////////
+////////////////////////////
+// QUADRANT => PITCH/GAIN // (for Gametrak)
+////////////////////////////
 
 /*
 Define quadrants:
@@ -232,28 +234,14 @@ while( true ) {
     clientPitch + addPitch[0] => Std.mtof => osc1.freq;
     clientPitch + addPitch[1] => Std.mtof => osc2.freq;
     
-    <<< addPitch[0], addPitch[1] >>>;
+    //<<< addPitch[0], addPitch[1] >>>;
     //<<< setGain[0], setGain[1] >>>;
     //<<< axisDiff[0], axisDiff[1] >>>;
-    //<<< Math.fabs(axisDiff[0]), Math.fabs(axisDiff[1]) >>>;
-    
-    /*
-    clientPitch => osc1.freq => osc2.freq;
-    
-    if (gt.axis[0] > 0.1) {
-        (gt.axis[0] - 0.1) / 5 => r.mix;
-    } else {
-        0 => r.mix;
-    }
-    
-    if (gt.axis[5] > 0.1) {
-        (gt.axis[5] - 0.1) * 0.1 => c.modDepth;
-        <<< (gt.axis[5] - 0.1) * 0.1 >>>;
-    }
-    */
-    
+
     if (vibrato == 1) {
-        0.05 => c.modDepth;
+        0.02 => c.modDepth;
+    } else {
+        0 => c.modDepth;
     }
     
     TEMPO => now;

@@ -35,7 +35,7 @@ fun void network()
                 if(omsg.getFloat(0) != pitch || omsg.getFloat(1) != velocity) {
                     omsg.getFloat(0) => pitch;
                     omsg.getFloat(1) => velocity;
-                    play(pitch, velocity);
+                    receiveMsg (pitch, velocity);
                 }
             }
         }
@@ -46,27 +46,30 @@ fun void network()
 // INSTRUMENT SOUNDS //
 ///////////////////////
 
-SinOsc sin => Gain g => Chorus c => NRev r => dac;
+SinOsc osc1 => Gain g => Chorus c => NRev r => dac;
+TriOsc osc2 => g;
+
+1 => g.gain;
 5 => c.modFreq;
 0 => c.modDepth;
 1 => c.mix;
 
 0 => float clientGain;
-0 => int mute;
+20 => float clientPitch;
+0 => int vibrato;
 
-fun void play (float pitch, float velocity) {
+fun void receiveMsg (float pitch, float velocity) {
     
     // set pitch
-    pitch - 12 => Std.mtof => sin.freq;
-
-    clientGain => g.gain;
+    pitch => clientPitch;
     
     velocity => clientGain;
 }
 
-///////////////////////
+
+////////////////////////
 // GAMETRACK FUNCTION //
-///////////////////////
+////////////////////////
 
 0 => float DEADZONE;
 
@@ -125,7 +128,10 @@ fun void gametrak()
                     gt.axis[msg.which] => gt.lastAxis[msg.which];
                     // the z axes map to [0,1], others map to [-1,1]
                     if( msg.which != 2 && msg.which != 5 )
-                    { msg.axisPosition => gt.axis[msg.which]; }
+                    { 
+                        msg.axisPosition => gt.axis[msg.which];
+                        quadrant_output(gt.axis);
+                    }
                     else
                     {
                         1 - ((msg.axisPosition + 1) / 2) - DEADZONE => gt.axis[msg.which];
@@ -133,10 +139,75 @@ fun void gametrak()
                     }
                 }
             } else if (msg.isButtonDown()) {
-                1 => mute;
+                1 => vibrato;
             } else if (msg.isButtonUp()) {
-                0 => mute;
+                0 => vibrato;
             }
+        }
+    }
+}
+
+
+////////////////////////
+// QUADRANT-TO-OUTPUT // (for Gametrak)
+////////////////////////
+
+/*
+Define quadrants:
+Left:
+   north : +7 (V)
+   south : +0 (I)
+   east  : +5 (IV)
+   west  : -3 (vi)
+Right:
+   north : +11 (vii)
+   south : +4  (iii)
+   east  : +12 (I)
+   west  : +7  (V)
+*/
+
+// Helpful to determine quadrant
+float axisDiff[2];
+
+// Outputs: 
+// 1. Intervals to add to clientPitch
+// 2. Gains
+int addPitch[2];
+float setGain[2];
+
+fun void quadrant_output(float axis[]) {
+    
+    // Difference between abs. values of up/down and left/right
+    Math.fabs(axis[1]) - Math.fabs(axis[0]) => axisDiff[0];
+    Math.fabs(axis[4]) - Math.fabs(axis[3]) => axisDiff[1];
+    
+    // Quadrants define pitches
+    // Left
+    if (axisDiff[0] > 0) {
+        if (axis[1] > 0) 7 => addPitch[0]; //north
+        else             0 => addPitch[0]; //south
+    } else {
+        if (axis[0] > 0) 5 => addPitch[0]; //east
+        else            -3 => addPitch[0]; //west
+    }
+    // Right
+    if (axisDiff[1] > 0) {
+        if (axis[4] > 0) 11 => addPitch[1]; //north
+        else              4 => addPitch[1]; //south
+    } else {
+        if (axis[3] > 0) 12 => addPitch[1]; //east
+        else              7 => addPitch[1]; //west
+    }
+    
+    // Gain = absolute differences * axis[2 or 5]
+    // Boundaries padded by mute zone
+    for (0 => int i; i < 2; i++) {
+        3 * i + 2 => int pullAxis;
+        if (Math.fabs(axisDiff[i]) > 0.05) {
+            axis[pullAxis] * Math.fabs(axisDiff[i]) => setGain[i];
+            // Could have mapped "... * (Math.fabs(axisDiff[i]) - 0.05) / 0.95
+        } else {
+            0 => setGain[i];
         }
     }
 }
@@ -149,11 +220,25 @@ fun void gametrak()
 spork ~ network();
 spork ~ gametrak();
 
-dur remainder;
+100::ms => dur TEMPO;
 
 // infinite time loop
 while( true ) {
-    clientGain * gt.axis[2] * 2 => g.gain;
+    
+    // Set gain and pitch depending on quadrant function
+    clientGain * setGain[0] => osc1.gain;
+    clientGain * setGain[1] => osc2.gain;
+    
+    clientPitch + addPitch[0] => Std.mtof => osc1.freq;
+    clientPitch + addPitch[1] => Std.mtof => osc2.freq;
+    
+    <<< addPitch[0], addPitch[1] >>>;
+    //<<< setGain[0], setGain[1] >>>;
+    //<<< axisDiff[0], axisDiff[1] >>>;
+    //<<< Math.fabs(axisDiff[0]), Math.fabs(axisDiff[1]) >>>;
+    
+    /*
+    clientPitch => osc1.freq => osc2.freq;
     
     if (gt.axis[0] > 0.1) {
         (gt.axis[0] - 0.1) / 5 => r.mix;
@@ -165,15 +250,14 @@ while( true ) {
         (gt.axis[5] - 0.1) * 0.1 => c.modDepth;
         <<< (gt.axis[5] - 0.1) * 0.1 >>>;
     }
+    */
     
-    if (mute == 1) {
-        0 => g.gain;
+    if (vibrato == 1) {
+        0.05 => c.modDepth;
     }
-        
     
-    50::ms => now;
+    TEMPO => now;
 }
-
 
 
 

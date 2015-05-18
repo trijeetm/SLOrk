@@ -147,13 +147,13 @@ fun void handleKeyboard() {
                 */
                 
                 // tempo
-                if (key == 46) {
+                if (key == 35) {
                     if (TEMPO < 300::ms) {
                         5::ms + TEMPO => TEMPO;
                     }
                 }
-                if (key == 45) {
-                    if (TEMPO > 180::ms) {
+                if (key == 36) {
+                    if (TEMPO > 100::ms) {
                         TEMPO - 5::ms => TEMPO;
                     }
                 }

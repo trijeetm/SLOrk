@@ -2,7 +2,7 @@
 0 => int deviceNum;
 
 // instantiate a HidIn object
-HidIn hi;
+Hid hi;
 // structure to hold HID messages
 HidMsg msg;
 
@@ -66,7 +66,7 @@ for( int i; i < HOSTS.size(); i++ )
 }
 
 // play
-fun void play( int host, float pitch, float master, int nBeats, int count )
+fun void play( int host, int pitch, float master, int nBeats, int count )
 {
     // sanity check
     if( host < 0 || host >= XMIT.size() )
@@ -84,7 +84,7 @@ fun void play( int host, float pitch, float master, int nBeats, int count )
 }
 
 // play all
-fun void playAll( float pitch, float master, int nBeats, int count )
+fun void playAll( int pitch, float master, int nBeats, int count )
 {
     for( int i; i < XMIT.size(); i++ )
     {
@@ -93,7 +93,7 @@ fun void playAll( float pitch, float master, int nBeats, int count )
 }
 
 0 => int count;
-48 => float pitch;
+48 => int pitch;
 
 while( true )
 {

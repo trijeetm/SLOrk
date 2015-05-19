@@ -16,8 +16,8 @@ OSC_PORT => in.port;
 // the address to listen for
 in.addAddress( "/slork/play" );
 
-int clientPitch;
-float clientGain;
+int serverPitch;
+float serverGain;
 
 // handle
 fun void network()
@@ -32,9 +32,9 @@ fun void network()
         {
             if( omsg.address == "/slork/play" )
             {
-                if(omsg.getFloat(0) != clientPitch || omsg.getFloat(1) != clientGain) {
-                    omsg.getInt(0) => clientPitch;
-                    omsg.getFloat(1) => clientGain;
+                if(omsg.getFloat(0) != serverPitch || omsg.getFloat(1) != serverGain) {
+                    omsg.getInt(0) => serverPitch;
+                    omsg.getFloat(1) => serverGain;
                 }
             }
         }
@@ -161,7 +161,7 @@ Right:
 float axisDiff[2];
 
 // Outputs: 
-// 1. Intervals to add to clientPitch
+// 1. Intervals to add to serverPitch
 // 2. Gains
 int addPitch[2];
 float setGain[2];
@@ -217,11 +217,11 @@ spork ~ gametrak();
 while( true ) {
     
     // Set gain and pitch depending on quadrant function
-    clientGain * setGain[0] => osc1.gain;
-    clientGain * setGain[1] => osc2.gain;
+    serverGain * setGain[0] => osc1.gain;
+    serverGain * setGain[1] => osc2.gain;
     
-    clientPitch + addPitch[0] => Std.mtof => osc1.freq;
-    clientPitch + addPitch[1] => Std.mtof => osc2.freq;
+    serverPitch + addPitch[0] => Std.mtof => osc1.freq;
+    serverPitch + addPitch[1] => Std.mtof => osc2.freq;
     
     //<<< addPitch[0], addPitch[1] >>>;
     //<<< setGain[0], setGain[1] >>>;

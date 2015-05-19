@@ -66,7 +66,7 @@ for( int i; i < HOSTS.size(); i++ )
 }
 
 // play
-fun void play( int host, int pitch, float master, int nBeats, int count )
+fun void play( int host, int scale, float master, int nBeats, int count )
 {
     // sanity check
     if( host < 0 || host >= XMIT.size() )
@@ -75,7 +75,7 @@ fun void play( int host, int pitch, float master, int nBeats, int count )
     // start a message
     XMIT[host].start( "/slork/play" );
     // add parameters to be sent
-    XMIT[host].add( pitch );
+    XMIT[host].add( scale );
     XMIT[host].add( master );
     XMIT[host].add( nBeats );
     XMIT[host].add( count );
@@ -84,22 +84,22 @@ fun void play( int host, int pitch, float master, int nBeats, int count )
 }
 
 // play all
-fun void playAll( int pitch, float master, int nBeats, int count )
+fun void playAll( int scale, float master, int nBeats, int count )
 {
     for( int i; i < XMIT.size(); i++ )
     {
-        play( i, pitch, master, nBeats, count );
+        play( i, scale, master, nBeats, count );
     }
 }
 
 0 => int count;
-48 => int pitch;
+0 => int scale;
 
 while( true )
 {
     16 => int nBeats;
 
-    playAll( pitch, 1, nBeats, count );
+    playAll( scale, 1, nBeats, count );
 
     (count + 1) % nBeats => count;
 
@@ -129,30 +129,30 @@ fun void handleKeyboard() {
 
                 // note selector
                 if (key == 30) {
-                    48 => pitch;
+                    0 => scale;
                 }
                 if (key == 31) {
-                    48 + 5 => pitch;
-                }
-                if (key == 32) {
-                    48 + 7 => pitch;
-                }
-                if (key == 33) {
-                    48 + 11 => pitch;
-                }
-                if (key == 34) {
-                    48 + 12 => pitch;
+                    1 => scale;
                 }
                 /*
+                if (key == 32) {
+                    2 => scale;
+                }
+                if (key == 33) {
+                    3 => scale;
+                }
+                if (key == 34) {
+                    4 => scale;
+                }
                 */
                 
                 // tempo
-                if (key == 35) {
+                if (key == 38) {
                     if (TEMPO < 300::ms) {
                         5::ms + TEMPO => TEMPO;
                     }
                 }
-                if (key == 36) {
+                if (key == 39) {
                     if (TEMPO > 100::ms) {
                         TEMPO - 5::ms => TEMPO;
                     }

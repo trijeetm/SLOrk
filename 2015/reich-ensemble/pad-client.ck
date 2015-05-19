@@ -16,8 +16,23 @@ OSC_PORT => in.port;
 // the address to listen for
 in.addAddress( "/slork/play" );
 
-int serverPitch;
+// int serverPitch;
 float serverGain;
+
+////////////
+// SCALES //
+////////////
+0 => int scale;
+int scales[2][7];
+
+// number of octave to start from 
+4 => int octaveOffset;
+
+// scale 1
+[0, 2, 3, 5, 7, 9, 10] @=> scales[0];
+// scale 2
+[3, 5, 7, 9, 10, 12, 14] @=> scales[1];
+
 
 // handle
 fun void network()
@@ -32,10 +47,8 @@ fun void network()
         {
             if( omsg.address == "/slork/play" )
             {
-                if(omsg.getFloat(0) != serverPitch || omsg.getFloat(1) != serverGain) {
-                    omsg.getInt(0) => serverPitch;
-                    omsg.getFloat(1) => serverGain;
-                }
+                omsg.getInt(0) => scale;
+                omsg.getFloat(1) => serverGain;
             }
         }
     }
@@ -163,8 +176,9 @@ float axisDiff[2];
 // Outputs: 
 // 1. Intervals to add to serverPitch
 // 2. Gains
-int addPitch[2];
+// int addPitch[2];
 float setGain[2];
+int noteSelector[2];
 
 fun void quadrant_output(float axis[]) {
     
@@ -173,21 +187,50 @@ fun void quadrant_output(float axis[]) {
     Math.fabs(axis[4]) - Math.fabs(axis[3]) => axisDiff[1];
     
     // Quadrants define pitches
+    // old code
+    // Left
+        /*
+        if (axisDiff[0] > 0) {
+            if (axis[1] > 0) 7 => addPitch[0]; //north
+            else             0 => addPitch[0]; //south
+        } else {
+            if (axis[0] > 0) 5 => addPitch[0]; //east
+            else            -3 => addPitch[0]; //west
+        }
+        // Right
+        if (axisDiff[1] > 0) {
+            if (axis[4] > 0) 11 => addPitch[1]; //north
+            else              4 => addPitch[1]; //south
+        } else {
+            if (axis[3] > 0) 12 => addPitch[1]; //east
+            else              7 => addPitch[1]; //west
+        }
+        */
+
+    // assign noteSelector to select notes of scale
     // Left
     if (axisDiff[0] > 0) {
-        if (axis[1] > 0) 7 => addPitch[0]; //north
-        else             0 => addPitch[0]; //south
+        if (axis[1] > 0) 
+            0 => noteSelector[0]; //north
+        else             
+            1 => noteSelector[0]; //south
     } else {
-        if (axis[0] > 0) 5 => addPitch[0]; //east
-        else            -3 => addPitch[0]; //west
+        if (axis[0] > 0) 
+            2 => noteSelector[0]; //east
+        else            
+            3 => noteSelector[0]; //west
     }
     // Right
     if (axisDiff[1] > 0) {
-        if (axis[4] > 0) 11 => addPitch[1]; //north
-        else              4 => addPitch[1]; //south
+        if (axis[4] > 0) 
+            8 => noteSelector[1]; //north
+        else              
+            7 => noteSelector[1]; //south
     } else {
-        if (axis[3] > 0) 12 => addPitch[1]; //east
-        else              7 => addPitch[1]; //west
+        if (axis[3] > 0) 
+            6 => noteSelector[1]; //east
+        else              
+            5 => noteSelector[1]; //west
     }
     
     // Gain = absolute differences * axis[2 or 5]
@@ -220,8 +263,10 @@ while( true ) {
     serverGain * setGain[0] => osc1.gain;
     serverGain * setGain[1] => osc2.gain;
     
-    serverPitch + addPitch[0] => Std.mtof => osc1.freq;
-    serverPitch + addPitch[1] => Std.mtof => osc2.freq;
+    <<< scale, noteSelector[0], noteSelector[1] >>>;
+
+    (12 * (octaveOffset + (noteSelector[0] / 7))) + scales[scale][noteSelector[0] % 7] => Std.mtof => osc1.freq;
+    (12 * (octaveOffset + (noteSelector[1] / 7))) + scales[scale][noteSelector[1] % 7] => Std.mtof => osc2.freq;
     
     //<<< addPitch[0], addPitch[1] >>>;
     //<<< setGain[0], setGain[1] >>>;

@@ -34,7 +34,8 @@ false => int pause;
 Gain masterGain;
 0 => int instrument;
 0 => int beatPeriod;
-float percProbabilities[1][4];
+5 => int nBeatPeriods;
+float percProbabilities[1][nBeatPeriods];
 Gain percGains[1];
 0 => float inputGain;
 NRev percRev[1];
@@ -43,7 +44,7 @@ NRev percRev[1];
 SndBuf percSamples[nSamples];
 
 for (0 => int i; i < 1; i++) {
-    for (0 => int j; j < 4; j++)
+    for (0 => int j; j < nBeatPeriods; j++)
         0 => percProbabilities[i][j];
     0 => percGains[i].gain;
     0 => percRev[i].mix;
@@ -123,8 +124,7 @@ fun void play(float pitch) {
     <<< "-----------------------------------    " >>>;
     <<< "Controls:                              " >>>;
     <<< "-----------------------------------    " >>>;
-    <<< "1 2 3 4 5 : Select instrument          " >>>;
-    <<< ", . /     : Select beat                " >>>;
+    <<< "1 2 3 4 5 : Select beat period         " >>>;
     <<< "[ ]       : Probability down / up      " >>>;
     <<< "- +       : Volume down / up           " >>>;
     <<< "z x       : Reverb down / up           " >>>;
@@ -133,33 +133,35 @@ fun void play(float pitch) {
 
     for (0 => int i; i < 1; i++) {
         <<< "------------------------               " >>>;
-        for (0 => int j; j < 4; j++) {
+        for (0 => int j; j < nBeatPeriods; j++) {
             percProbabilities[i][j] => float prob;
             0 => float _gain;
 
             <<< j, prob, inputGain, percRev[i].mix() >>>;
 
-            if (count == 0) {
+            if (count % nBeats == 0) {
                 percProbabilities[i][j] * 4 => prob;            
                 inputGain * Math.random2f(0.9, 1) => _gain;
             }
-            else if (count == (nBeats / 2)) {
-                percProbabilities[i][j] * 2.5 => prob;
+            else if (count % (nBeats / 2) == 0) {
+                percProbabilities[i][j] * 2 => prob;
                 inputGain * Math.random2f(0.8, 0.9) => _gain;
             }
-            else if (count == (nBeats / 4)) {
-                percProbabilities[i][j] * 1.5 => prob;
+            else if (count % (nBeats / 4) == 0) {
+                percProbabilities[i][j] * 1 => prob;
                 inputGain * Math.random2f(0.7, 0.8) => _gain;
             }
-            else if (count == (nBeats / 8)) {
+            else if (count % (nBeats / 8) == 0) {
                 inputGain * Math.random2f(0.6, 0.7) => _gain;
             }
+            else if (count % (nBeats / 16) == 0) {
+                inputGain * Math.random2f(0.5, 0.6) => _gain;
+            }
             else {
-                inputGain * Math.random2f(0.4, 0.6) => _gain;
+                inputGain * Math.random2f(0.4, 0.5) => _gain;
             }
 
-            //<<< (nBeats / Math.pow(2, j)) >>>;
-            if ((j == 3) || (count % (nBeats / Math.pow(2, j)) == 0)) {
+            if ((j == nBeatPeriods - 1) || (count % (nBeats / Math.pow(2, j)) == 0)) {
                 // <<< count >>>;
                 if ((Math.random2f(0, 1) < prob) && !pause) {
                     _gain => percGains[i].gain;
@@ -200,6 +202,9 @@ fun void handleKeyboard() {
                 }
                 if (key == 33) {
                     3 => beatPeriod;
+                }
+                if (key == 34) {
+                    4 => beatPeriod;
                 }
 
                 // rev

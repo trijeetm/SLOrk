@@ -15,7 +15,7 @@ spork ~ handleKeyboard();
 
 // Notes: Also include "playDrums", "playBass", "playBowed" functions
 
-180::ms => dur TEMPO;
+90::ms => dur TEMPO;
 
 // osc port
 6449 => int OSC_PORT;
@@ -97,7 +97,7 @@ fun void playAll( int scale, float master, int nBeats, int count )
 
 while( true )
 {
-    16 => int nBeats;
+    32 => int nBeats;
 
     playAll( scale, 1, nBeats, count );
 
@@ -148,12 +148,12 @@ fun void handleKeyboard() {
                 
                 // tempo
                 if (key == 38) {
-                    if (TEMPO < 300::ms) {
+                    if (TEMPO < 120::ms) {
                         5::ms + TEMPO => TEMPO;
                     }
                 }
                 if (key == 39) {
-                    if (TEMPO > 100::ms) {
+                    if (TEMPO > 60::ms) {
                         TEMPO - 5::ms => TEMPO;
                     }
                 }

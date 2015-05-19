@@ -5,119 +5,6 @@
 0 => int setMotif;
 0 => int triggerMotif; // if on, next quarter note changes motif
                        // controlled by gametrak pedal
-0 => int currentMotif;
-
-////////////////////
-// SET UP NETWORK //
-////////////////////
-
-// osc port
-6449 => int OSC_PORT;
-
-// OSC
-OscIn in;
-OscMsg omsg;
-
-// the port
-OSC_PORT => in.port;
-// the address to listen for
-in.addAddress( "/slork/play" );
-
-int serverPitch;
-float serverGain;
-0 => int count;
-
-// handle
-fun void network()
-{
-    while(true)
-    {
-        // wait for incoming event
-        in => now;
-        
-        // drain the message queue
-        while( in.recv(omsg) )
-        {
-            if( omsg.address == "/slork/play" )
-            {
-                if(omsg.getInt(3) != count) {
-                    omsg.getInt(0) => serverPitch;
-                    omsg.getFloat(1) => serverGain;
-                    omsg.getInt(3) => count;
-                    <<< setMotif >>>;
-                }
-            }
-            
-            // New events can only occur on quarter notes
-            if (count % 4 == 0) {
-                //<<< "Quarter note!" >>>;
-                if (triggerMotif == 1) {
-                    // TODO: change motif
-                    0 => triggerMotif;
-                }
-                
-            }
-            
-        }
-    }
-}
-
-
-//////////////////////
-// INSTRUMENT UGENS //
-//////////////////////
-
-ModalBar bar1 => Gain g => NRev r => dac;
-ModalBar bar2 => g;
-
-1 => r.gain;
-0.02 => r.mix;
-
-0 => bar1.preset; //Marimba
-0.5 => bar1.stickHardness;
-0.5 => bar1.strikePosition;
-
-
-////////////
-// MOTIFS //
-////////////
-
-// Play function
-fun void play (int pitch, dur T) {
-    pitch => Std.mtof => bar1.freq;
-    1 => bar1.strike;
-    T => now;
-}
-
-// PlayMotif function
-fun void playMotif () {
-    while (true) {
-        if (currentMotif == 1) {
-            for(0 => int i; i < 16; i++) {
-                play(serverPitch, Q);
-            }
-        } else if (currentMotif == 2) {
-            for(0 => int i; i < 16; i++) {
-                play(serverPitch + i, Q);
-            }
-        } else if (currentMotif == 3) {
-            play(serverPitch - 5, 2*Q);
-            play(serverPitch, Q);
-            play(serverPitch + 2, Q);
-            play(serverPitch + 4, 2*Q);
-            play(serverPitch, 2*Q);
-            play(serverPitch + 2, 0.5*Q);
-            play(serverPitch - 10, 0.5*Q);
-            play(serverPitch, 0.5*Q);
-            play(serverPitch - 12, 0.5*Q);
-            play(serverPitch - 1, 0.5*Q);
-            play(serverPitch - 13, 0.5*Q);
-            play(serverPitch - 5, 0.5*Q);
-            play(serverPitch - 10, 0.5*Q);
-            play(serverPitch, 2*Q);
-        }
-    }
-}
 
 
 ///////////////////////
@@ -182,6 +69,118 @@ fun void quadrant_output(float axis[]) {
     // Gain = axis[2]
     (axis[2] - 0.05) / 0.95 => setGain;
     
+}
+
+////////////////////
+// SET UP NETWORK //
+////////////////////
+
+// osc port
+6449 => int OSC_PORT;
+
+// OSC
+OscIn in;
+OscMsg omsg;
+
+// the port
+OSC_PORT => in.port;
+// the address to listen for
+in.addAddress( "/slork/play" );
+
+int serverPitch;
+float serverGain;
+0 => int count;
+
+// handle
+fun void network()
+{
+    while(true)
+    {
+        // wait for incoming event
+        in => now;
+        
+        // drain the message queue
+        while( in.recv(omsg) )
+        {
+            if( omsg.address == "/slork/play" )
+            {
+                if(omsg.getInt(3) != count) {
+                    omsg.getInt(0) => serverPitch;
+                    omsg.getFloat(1) => serverGain;
+                    omsg.getInt(3) => count;
+                    <<< setMotif >>>;
+                }
+            }
+            
+            // New events can only occur on quarter notes
+            if (count % 4 == 0) {
+                //<<< "Quarter note!" >>>;
+                if (triggerMotif == 1) {
+                    spork ~ playMotif(setMotif);
+                    0 => triggerMotif;
+                }
+                
+            }
+            
+        }
+    }
+}
+
+
+//////////////////////
+// INSTRUMENT UGENS //
+//////////////////////
+
+ModalBar bar1 => Gain g => NRev r => dac;
+ModalBar bar2 => g;
+
+1 => r.gain;
+0.02 => r.mix;
+
+0 => bar1.preset; //Marimba
+0.5 => bar1.stickHardness;
+0.5 => bar1.strikePosition;
+
+
+////////////
+// MOTIFS //
+////////////
+
+// Play function
+fun void play (int pitch, dur T) {
+    pitch => Std.mtof => bar1.freq;
+    1 => bar1.strike;
+    T => now;
+}
+
+// PlayMotif function
+fun void playMotif (int motif) {
+    //while (true) {
+        if (motif == 1) {
+            for(0 => int i; i < 16; i++) {
+                play(serverPitch, Q);
+            }
+        } else if (motif == 2) {
+            for(0 => int i; i < 16; i++) {
+                play(serverPitch + i, Q);
+            }
+        } else if (motif == 3) {
+            play(serverPitch - 5, 2*Q);
+            play(serverPitch, Q);
+            play(serverPitch + 2, Q);
+            play(serverPitch + 4, 2*Q);
+            play(serverPitch, 2*Q);
+            play(serverPitch + 2, 0.5*Q);
+            play(serverPitch - 10, 0.5*Q);
+            play(serverPitch, 0.5*Q);
+            play(serverPitch - 12, 0.5*Q);
+            play(serverPitch - 1, 0.5*Q);
+            play(serverPitch - 13, 0.5*Q);
+            play(serverPitch - 5, 0.5*Q);
+            play(serverPitch - 10, 0.5*Q);
+            play(serverPitch, 2*Q);
+        }
+    //}
 }
 
 

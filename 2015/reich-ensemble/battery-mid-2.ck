@@ -3,8 +3,8 @@ me.sourceDir() + "/" => string dirRoot;
 if( me.args() ) me.arg(0) => dirRoot;
 
 [
-    "taiko2.wav",
-    "taiko.wav"
+    "mid3.wav",
+    "mid1.wav"
 ] @=> string sampleFiles[];
 
 2 => int nSamples;

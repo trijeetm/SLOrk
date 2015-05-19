@@ -28,6 +28,8 @@ spork ~ handleKeyboard();
 0 => int nBeats;
 0 => int count;
 
+false => int pause;
+
 // percussion control
 Gain masterGain;
 0 => int instrument;
@@ -159,7 +161,7 @@ fun void play(float pitch) {
             //<<< (nBeats / Math.pow(2, j)) >>>;
             if ((j == 3) || (count % (nBeats / Math.pow(2, j)) == 0)) {
                 // <<< count >>>;
-                if (Math.random2f(0, 1) < prob) {
+                if ((Math.random2f(0, 1) < prob) && !pause) {
                     _gain => percGains[i].gain;
                     playPerc(i);
                 }
@@ -234,6 +236,13 @@ fun void handleKeyboard() {
                     if (inputGain > 0) {
                         inputGain - 0.025 => inputGain;
                     }
+                }
+
+                if (key == 44) {
+                    if (pause == false)
+                        true => pause;
+                    else 
+                        false => pause;
                 }
                 
                 /*

@@ -1,4 +1,11 @@
-// Synth pad client
+// Mallet client
+
+200::ms => dur Q; // duration of 16th note, remove later
+
+0 => int setMotif;
+0 => int triggerMotif; // if on, next quarter note changes motif
+                       // controlled by gametrak pedal
+0 => int currentMotif;
 
 ////////////////////
 // SET UP NETWORK //
@@ -16,8 +23,9 @@ OSC_PORT => in.port;
 // the address to listen for
 in.addAddress( "/slork/play" );
 
-float pitch;
-float velocity;
+int serverPitch;
+float serverGain;
+0 => int count;
 
 // handle
 fun void network()
@@ -32,22 +40,35 @@ fun void network()
         {
             if( omsg.address == "/slork/play" )
             {
-                if(omsg.getFloat(0) != pitch || omsg.getFloat(1) != velocity) {
-                    omsg.getFloat(0) => pitch;
-                    omsg.getFloat(1) => velocity;
-                    receiveMsg (pitch, velocity);
+                if(omsg.getInt(3) != count) {
+                    omsg.getInt(0) => serverPitch;
+                    omsg.getFloat(1) => serverGain;
+                    omsg.getInt(3) => count;
+                    <<< setMotif >>>;
                 }
             }
+            
+            // New events can only occur on quarter notes
+            if (count % 4 == 0) {
+                //<<< "Quarter note!" >>>;
+                if (triggerMotif == 1) {
+                    // TODO: change motif
+                    0 => triggerMotif;
+                }
+                
+            }
+            
         }
     }
 }
+
 
 //////////////////////
 // INSTRUMENT UGENS //
 //////////////////////
 
-ModalBar bar1 => NRev r => dac;
-ModalBar bar2 => r;
+ModalBar bar1 => Gain g => NRev r => dac;
+ModalBar bar2 => g;
 
 1 => r.gain;
 0.02 => r.mix;
@@ -56,30 +77,60 @@ ModalBar bar2 => r;
 0.5 => bar1.stickHardness;
 0.5 => bar1.strikePosition;
 
-// These will be controlled by the server
-0 => float clientGain;
-20 => float clientPitch;
 
-fun void receiveMsg (float pitch, float velocity) {
-    
-    // set pitch
-    pitch => clientPitch;
-    // set max gain
-    velocity => clientGain;
+////////////
+// MOTIFS //
+////////////
+
+// Play function
+fun void play (int pitch, dur T) {
+    pitch => Std.mtof => bar1.freq;
+    1 => bar1.strike;
+    T => now;
+}
+
+// PlayMotif function
+fun void playMotif () {
+    while (true) {
+        if (currentMotif == 1) {
+            for(0 => int i; i < 16; i++) {
+                play(serverPitch, Q);
+            }
+        } else if (currentMotif == 2) {
+            for(0 => int i; i < 16; i++) {
+                play(serverPitch + i, Q);
+            }
+        } else if (currentMotif == 3) {
+            play(serverPitch - 5, 2*Q);
+            play(serverPitch, Q);
+            play(serverPitch + 2, Q);
+            play(serverPitch + 4, 2*Q);
+            play(serverPitch, 2*Q);
+            play(serverPitch + 2, 0.5*Q);
+            play(serverPitch - 10, 0.5*Q);
+            play(serverPitch, 0.5*Q);
+            play(serverPitch - 12, 0.5*Q);
+            play(serverPitch - 1, 0.5*Q);
+            play(serverPitch - 13, 0.5*Q);
+            play(serverPitch - 5, 0.5*Q);
+            play(serverPitch - 10, 0.5*Q);
+            play(serverPitch, 2*Q);
+        }
+    }
 }
 
 
-////////////////////////////
-// QUADRANT => PITCH/GAIN // (for Gametrak)
-////////////////////////////
+///////////////////////
+// QUADRANT => MOTIF // (for Gametrak)
+///////////////////////
 
 /*
 Define quadrants:
 Left:
 north : motif 1
 south : motif 3
-east  : motif 2
-west  : motif 4
+east  : motif 0 (mute)
+west  : motif 2
 Right:
 north : pitch shift up
 south : pitch shift down
@@ -88,51 +139,49 @@ west  : playback rate down
 */
 
 // Helpful to determine quadrant
-float axisDiff[2];
+float axisDiff;
 
 // Outputs: 
-// 1. Intervals to add to clientPitch
+// 1. Intervals to add to serverPitch
 // 2. Gains
-int setMotif;
 float setGain;
-int p.shift;
-int r.shift;
+0 => int setRate;
+0 => int setPitch;
 
 fun void quadrant_output(float axis[]) {
     
     // Difference between abs. values of up/down and left/right
-    Math.fabs(axis[1]) - Math.fabs(axis[0]) => axisDiff[0];
-    Math.fabs(axis[4]) - Math.fabs(axis[3]) => axisDiff[1];
+    Math.fabs(axis[1]) - Math.fabs(axis[0]) => axisDiff;
     
-    // Quadrants define pitches
-    // Left
-    if (axisDiff[0] > 0) {
+    // Left: quadrant defines motif no.
+    if (axisDiff > 0) {
         if (axis[1] > 0) 1 => setMotif; //north
         else             3 => setMotif; //south
     } else {
-        if (axis[0] > 0) 2 => setMotif; //east
-        else             4 => setMotif; //west
-    }
-    // Right
-    if (axisDiff[1] > 0) {
-        if (axis[4] > 0) 11 => setMotif; //north
-        else              4 => setMotif; //south
-    } else {
-        if (axis[3] > 0) 12 => setMotif; //east
-        else              7 => setMotif; //west
+        if (axis[0] > 0) 0 => setMotif; //east
+        else             2 => setMotif; //west
     }
     
-    // Gain = absolute differences * axis[2 or 5]
-    // Boundaries padded by mute zone
-    for (0 => int i; i < 2; i++) {
-        3 * i + 2 => int pullAxis;
-        if (Math.fabs(axisDiff[i]) > 0.05) {
-            axis[pullAxis] * Math.fabs(axisDiff[i]) => setGain[i];
-            // Could have mapped "... * (Math.fabs(axisDiff[i]) - 0.05) / 0.95
-        } else {
-            0 => setGain[i];
-        }
+    // Right
+    if (axis[3] > 0.5) {
+        1 => setRate;
+    } else if (axis[3] < -0.5) {
+        -1 => setRate;
+    } else {
+        0 => setRate;
     }
+    
+    if (axis[4] > 0.5) {
+        1 => setPitch;
+    } else if (axis[4] < -0.5) {
+        -1 => setPitch;
+    } else {
+        0 => setPitch;
+    }
+    
+    // Gain = axis[2]
+    (axis[2] - 0.05) / 0.95 => setGain;
+    
 }
 
 
@@ -208,9 +257,7 @@ fun void gametrak()
                     }
                 }
             } else if (msg.isButtonDown()) {
-                1 => vibrato;
-            } else if (msg.isButtonUp()) {
-                0 => vibrato;
+                1 => triggerMotif;
             }
         }
     }
@@ -224,29 +271,14 @@ fun void gametrak()
 spork ~ network();
 spork ~ gametrak();
 
-100::ms => dur TEMPO;
+100::ms => dur REFRESH; // refresh rate
 
 // infinite time loop
 while( true ) {
     
-    // Set gain and pitch depending on quadrant function
-    clientGain * setGain[0] => osc1.gain;
-    clientGain * setGain[1] => osc2.gain;
-    
-    clientPitch + setMotif[0] => Std.mtof => osc1.freq;
-    clientPitch + setMotif[1] => Std.mtof => osc2.freq;
-    
-    //<<< setMotif[0], setMotif[1] >>>;
-    //<<< setGain[0], setGain[1] >>>;
-    //<<< axisDiff[0], axisDiff[1] >>>;
-
-    if (vibrato == 1) {
-        0.02 => c.modDepth;
-    } else {
-        0 => c.modDepth;
-    }
-    
-    TEMPO => now;
+    // Set gain
+    serverGain * setGain => g.gain;
+    REFRESH => now;
 }
 
 

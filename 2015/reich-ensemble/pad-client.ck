@@ -16,8 +16,8 @@ OSC_PORT => in.port;
 // the address to listen for
 in.addAddress( "/slork/play" );
 
-float pitch;
-float velocity;
+int clientPitch;
+float clientGain;
 
 // handle
 fun void network()
@@ -32,10 +32,9 @@ fun void network()
         {
             if( omsg.address == "/slork/play" )
             {
-                if(omsg.getFloat(0) != pitch || omsg.getFloat(1) != velocity) {
-                    omsg.getFloat(0) => pitch;
-                    omsg.getFloat(1) => velocity;
-                    receiveMsg (pitch, velocity);
+                if(omsg.getFloat(0) != clientPitch || omsg.getFloat(1) != clientGain) {
+                    omsg.getInt(0) => clientPitch;
+                    omsg.getFloat(1) => clientGain;
                 }
             }
         }
@@ -56,17 +55,7 @@ TriOsc osc2 => g;
 0.1 => r.mix;
 
 // These will be controlled by the gametrak
-0 => float clientGain;
-20 => float clientPitch;
 0 => int vibrato;
-
-fun void receiveMsg (float pitch, float velocity) {
-    
-    // set pitch
-    pitch => clientPitch;
-    
-    velocity => clientGain;
-}
 
 
 ////////////////////////

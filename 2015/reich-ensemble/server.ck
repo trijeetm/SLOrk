@@ -28,18 +28,21 @@ if( HOSTS.size() == 0 )
 {
     HOSTS << "localhost";
 
+    // battery (6)
+
+    // mallets (3)
+
+    // pads (3)
+
     /*
     HOSTS << "gelato.local";
     HOSTS << "foiegras.local";
     HOSTS << "kimchi.local";
     HOSTS << "lasagna.local";
-    // HOSTS << "chowder.local";
     HOSTS << "hamburger.local";
     HOSTS << "icetea.local";
     HOSTS << "empanada.local";
-    // HOSTS << "albacore.local";
     HOSTS << "nachos.local";
-    
     HOSTS << "omelet.local";
     HOSTS << "xanax.local";
     HOSTS << "banhmi.local";
@@ -47,6 +50,9 @@ if( HOSTS.size() == 0 )
     HOSTS << "peanutbutter.local";
     HOSTS << "jambalaya.local";
     */
+
+    // HOSTS << "chowder.local";
+    // HOSTS << "albacore.local";
 }
 
 // number of targets
@@ -146,6 +152,7 @@ fun void handleKeyboard() {
                 }
                 */
                 
+                /*
                 // tempo
                 if (key == 38) {
                     if (TEMPO < 120::ms) {
@@ -157,6 +164,7 @@ fun void handleKeyboard() {
                         TEMPO - 5::ms => TEMPO;
                     }
                 }
+                */
 
             }
             else

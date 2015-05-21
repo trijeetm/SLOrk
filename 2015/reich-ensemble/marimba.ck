@@ -17,28 +17,39 @@ ModalBar bar => NRev r => Gain g => Gain master => dac;
 int scales[2][7];
 
 // number of octave to start from 
-6 => int octaveOffset;
+6 - 2 => int octaveOffset;
+
+// cMaj
+// eMaj
+// DflatMaj
+// bMaj
 
 // scale 1
-[0, 2, 3, 5, 7, 9, 10] @=> scales[0];
+[0, 2, 4, 5, 7, 9, 11] @=> scales[0];
 // scale 2
-[3, 5, 7, 9, 10, 12, 14] @=> scales[1];
+[4, 6, 8, 9, 11, 13, 15] @=> scales[1];
+// scale 3
+[1, 3, 5, 6, 8, 10, 12] @=> scales[2];
+// scale 4
+[11, 13, 15, 16, 18, 20, 22] @=> scales[3];
 
 ////////////
 // MOTIFS //
 ////////////
 0 => int motif;
-int motifs[2][16];
-2 => int nMotifs;       // number of motifs, update when changed
+int motifs[3][16];
+3 => int nMotifs;       // number of motifs, update when changed
 
 /*
 -1 : rest
 0+ : note number in scale 
 */
 // motif 1
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] @=> motifs[0];
+[14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14] @=> motifs[0];
 // motif 2
-[0, 1, 2, 3, 4, 5, 6, 7, 8, -1, 8, -1, 6, 4, 2, 0] @=> motifs[1];
+[19, -1, -1, 18, 19, -1, -1, 18, 19, -1, -1, 18, 23, 17, -1, -1] @=> motifs[1];
+// motif 3
+[21, 18, 15, -1, 19, 16, -1, 13, 18, 15, 12, -1, -1, -1, -1, -1] @=> motifs[2];
 
 0 => int motifPlayhead;
 

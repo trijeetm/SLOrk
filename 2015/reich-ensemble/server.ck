@@ -140,13 +140,13 @@ fun void handleKeyboard() {
                 if (key == 31) {
                     1 => scale;
                 }
-                /*
                 if (key == 32) {
                     2 => scale;
                 }
                 if (key == 33) {
                     3 => scale;
                 }
+                /*
                 if (key == 34) {
                     4 => scale;
                 }

@@ -28,10 +28,19 @@ int scales[2][7];
 // number of octave to start from 
 4 => int octaveOffset;
 
+// cMaj
+// eMaj
+// DflatMaj
+// bMaj
+
 // scale 1
-[0, 2, 3, 5, 7, 9, 10] @=> scales[0];
+[0, 2, 4, 5, 7, 9, 11] @=> scales[0];
 // scale 2
-[3, 5, 7, 9, 10, 12, 14] @=> scales[1];
+[4, 6, 8, 9, 11, 13, 15] @=> scales[1];
+// scale 3
+[1, 3, 5, 6, 8, 10, 12] @=> scales[2];
+// scale 4
+[11, 13, 15, 16, 18, 20, 22] @=> scales[3];
 
 
 // handle
@@ -187,50 +196,37 @@ fun void quadrant_output(float axis[]) {
     Math.fabs(axis[4]) - Math.fabs(axis[3]) => axisDiff[1];
     
     // Quadrants define pitches
-    // old code
-    // Left
-        /*
-        if (axisDiff[0] > 0) {
-            if (axis[1] > 0) 7 => addPitch[0]; //north
-            else             0 => addPitch[0]; //south
-        } else {
-            if (axis[0] > 0) 5 => addPitch[0]; //east
-            else            -3 => addPitch[0]; //west
-        }
-        // Right
-        if (axisDiff[1] > 0) {
-            if (axis[4] > 0) 11 => addPitch[1]; //north
-            else              4 => addPitch[1]; //south
-        } else {
-            if (axis[3] > 0) 12 => addPitch[1]; //east
-            else              7 => addPitch[1]; //west
-        }
-        */
+    /*
+    left n s e w
+    4 0 3 -2
+    right n s e w
+    6 2 7 4
+    */
 
     // assign noteSelector to select notes of scale
     // Left
     if (axisDiff[0] > 0) {
         if (axis[1] > 0) 
-            0 => noteSelector[0]; //north
+            11 => noteSelector[0]; //north
         else             
-            1 => noteSelector[0]; //south
+            7 => noteSelector[0]; //south
     } else {
         if (axis[0] > 0) 
-            2 => noteSelector[0]; //east
+            10 => noteSelector[0]; //east
         else            
-            3 => noteSelector[0]; //west
+            5 => noteSelector[0]; //west
     }
     // Right
     if (axisDiff[1] > 0) {
         if (axis[4] > 0) 
-            8 => noteSelector[1]; //north
+            13 => noteSelector[1]; //north
         else              
-            7 => noteSelector[1]; //south
+            9 => noteSelector[1]; //south
     } else {
         if (axis[3] > 0) 
-            6 => noteSelector[1]; //east
+            14 => noteSelector[1]; //east
         else              
-            5 => noteSelector[1]; //west
+            18 => noteSelector[1]; //west
     }
     
     // Gain = absolute differences * axis[2 or 5]

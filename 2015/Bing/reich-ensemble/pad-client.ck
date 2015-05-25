@@ -19,14 +19,16 @@ in.addAddress( "/slork/play" );
 // int serverPitch;
 float serverGain;
 
+
 ////////////
 // SCALES //
 ////////////
+
 0 => int scale;
-int scales[2][7];
+int scales[4][7];
 
 // number of octave to start from 
-4 => int octaveOffset;
+3 => int octaveOffset;
 
 // cMaj
 // eMaj
@@ -67,14 +69,17 @@ fun void network()
 // INSTRUMENT UGENS //
 //////////////////////
 
-SinOsc osc1 => Gain g => Chorus c => NRev r => dac;
-TriOsc osc2 => g;
+BeeThree osc1 => Gain g => Chorus c => NRev r => dac;
+BeeThree osc2 => g;
 
 1 => g.gain;
 3 => c.modFreq;
 0 => c.modDepth;
 0.5 => c.mix;
 0.1 => r.mix;
+
+1 => osc1.noteOn;
+1 => osc2.noteOn;
 
 // These will be controlled by the gametrak
 0 => int vibrato;
@@ -233,8 +238,8 @@ fun void quadrant_output(float axis[]) {
     // Boundaries padded by mute zone
     for (0 => int i; i < 2; i++) {
         3 * i + 2 => int pullAxis;
-        if (Math.fabs(axisDiff[i]) > 0.05) {
-            axis[pullAxis] * Math.fabs(axisDiff[i]) => setGain[i];
+        if (Math.fabs(axisDiff[i]) > 0.05 && axis[pullAxis] > 0.01) {
+            (axis[pullAxis] - 0.01) / 0.99 * Math.fabs(axisDiff[i]) => setGain[i];
             // Could have mapped "... * (Math.fabs(axisDiff[i]) - 0.05) / 0.95
         } else {
             0 => setGain[i];
@@ -259,7 +264,7 @@ while( true ) {
     serverGain * setGain[0] => osc1.gain;
     serverGain * setGain[1] => osc2.gain;
     
-    <<< scale, noteSelector[0], noteSelector[1] >>>;
+    //<<< scale, noteSelector[0], noteSelector[1] >>>;
 
     (12 * (octaveOffset + (noteSelector[0] / 7))) + scales[scale][noteSelector[0] % 7] => Std.mtof => osc1.freq;
     (12 * (octaveOffset + (noteSelector[1] / 7))) + scales[scale][noteSelector[1] % 7] => Std.mtof => osc2.freq;

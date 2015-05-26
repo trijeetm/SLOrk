@@ -28,7 +28,7 @@ spork ~ handleKeyboard();
 0 => int nBeats;
 0 => int count;
 
-false => int pause;
+true => int pause;
 
 // percussion control
 Gain masterGain;
@@ -45,8 +45,9 @@ SndBuf percSamples[nSamples];
 
 for (0 => int i; i < 1; i++) {
     for (0 => int j; j < nBeatPeriods; j++)
-        0 => percProbabilities[i][j];
-    0 => percGains[i].gain;
+        if (j == nBeatPeriods - 1)
+            0.5 => percProbabilities[i][j];
+    0.5 => percGains[i].gain;
     0 => percRev[i].mix;
 
     dirRoot + sampleFiles[i] => string sampleSrc;

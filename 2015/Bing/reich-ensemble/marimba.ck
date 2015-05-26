@@ -1,20 +1,22 @@
 /////////
 // STK //
 /////////
-ModalBar bar => NRev r => Gain g => Gain master => dac;
+ModalBar bar => NRev r => LPF lpf => Gain g => Gain master => dac;
 
-0 => r.mix;
+0.03 => r.mix;
 0 => g.gain;
 
+3000 => lpf.freq;
+
 0 => bar.preset;        // marimba
-0.5 => bar.stickHardness;
-0.5 => bar.strikePosition;
+0.1 => bar.stickHardness;
+0.1 => bar.strikePosition;
 
 ////////////
 // SCALES //
 ////////////
 0 => int scale;
-int scales[2][7];
+int scales[4][7];
 
 // number of octave to start from 
 6 - 2 => int octaveOffset;
@@ -47,9 +49,9 @@ int motifs[3][16];
 // motif 1
 [14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14] @=> motifs[0];
 // motif 2
-[19, -1, -1, 18, 19, -1, -1, 18, 19, -1, -1, 18, 23, 17, -1, -1] @=> motifs[1];
+[19, -1, -1, 18, 16, -1, 19, -1, -1, 18, 16, -1, 23, -1, 18, -1] @=> motifs[1];
 // motif 3
-[21, 18, 15, -1, 19, 16, -1, 13, 18, 15, 12, -1, -1, -1, -1, -1] @=> motifs[2];
+[21, 18, 15, -1, 19, 16, -1, 13, -1, 18, -1, 15, 12, -1, 16, -1] @=> motifs[2];
 
 0 => int motifPlayhead;
 
@@ -59,7 +61,7 @@ int motifs[3][16];
 
 0 => int pitchShift;
 // root, third, fifth
-[0, 2, 4] @=> int pitchShiftAmounts[];
+[-3, 0, 3] @=> int pitchShiftAmounts[];
 
 //////////////
 // GAMETRAK //
@@ -179,6 +181,8 @@ float serverGain;
 // all ze sporks!
 spork ~ network();
 
+spork ~ lfo();
+
 // infinite time loop
 while( true ) 1::second => now;
 
@@ -225,7 +229,8 @@ fun void play() {
     // gain
     Math.pow(gt.axis[5], 2) * 2 => g.gain;
     // pitch shift
-    ((gt.axis[0] + 1.0) / (2.0 / 3)) $ int => pitchShift;
+    ((gt.axis[3] + 0.9) / (2.0 / 3)) $ int => pitchShift;
+//    <<< gt.axis[3] >>>;
     // rate
     if (gt.axis[2] < 0.3)
         0 => nextMotifRate;
@@ -278,6 +283,13 @@ fun void tickBar() {
     pitchShiftAmounts[pitchShift] + note => note;
     (12 * (octaveOffset + (note / 7))) + scales[scale][note % 7] => int midi;
     midi => Std.mtof => bar.freq;
+    
+    Math.random2f(0.2, 0.4) => bar.stickHardness;
+    Math.random2f(0.4, 0.4) => bar.strikePosition;
+    
+    1 => bar.masterGain;
+    0.6 => bar.directGain;
+    
     Math.random2f(0.5, 1) => bar.strike;
 
     <<< "-------------------------------------------------" >>>;
@@ -286,4 +298,19 @@ fun void tickBar() {
 
 fun void cycleMotif() {
     (motif + 1) % nMotifs => motif;
+}
+
+fun void lfo() {
+    0 => float T;
+    
+    while (true) {
+        
+        1000 + (Math.fabs(Math.sin(T)) * 4000) => lpf.freq;
+        //0 => lpf.freq;
+        
+        //        <<< Math.fabs(Math.sin(T)) * 0.01 >>>;
+        
+        90::ms => now;
+        T + (2 * Math.PI / 360) => T; 
+    }
 }

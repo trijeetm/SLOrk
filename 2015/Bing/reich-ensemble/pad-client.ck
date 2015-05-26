@@ -19,14 +19,16 @@ in.addAddress( "/slork/play" );
 // int serverPitch;
 float serverGain;
 
+
 ////////////
 // SCALES //
 ////////////
+
 0 => int scale;
-int scales[2][7];
+int scales[4][7];
 
 // number of octave to start from 
-4 => int octaveOffset;
+3 => int octaveOffset;
 
 // cMaj
 // eMaj
@@ -67,14 +69,21 @@ fun void network()
 // INSTRUMENT UGENS //
 //////////////////////
 
-SinOsc osc1 => Gain g => Chorus c => NRev r => dac;
-TriOsc osc2 => g;
+BeeThree osc1 => Gain g => Chorus c => NRev r => dac;
+BeeThree osc2 => g;
+
+0 => osc1.controlOne;
+
+0 => osc2.controlOne;
 
 1 => g.gain;
 3 => c.modFreq;
 0 => c.modDepth;
 0.5 => c.mix;
 0.1 => r.mix;
+
+1 => osc1.noteOn;
+1 => osc2.noteOn;
 
 // These will be controlled by the gametrak
 0 => int vibrato;
@@ -84,7 +93,7 @@ TriOsc osc2 => g;
 // GAMETRACK FUNCTION //
 ////////////////////////
 
-0 => float DEADZONE;
+0.06 => float DEADZONE;
 
 0 => int device;
 if( me.args() ) me.arg(0) => Std.atoi => device;
@@ -168,15 +177,15 @@ fun void gametrak()
 /*
 Define quadrants:
 Left:
-   north : +7 (V)
-   south : +0 (I)
-   east  : +5 (IV)
-   west  : -3 (vi)
+north : +7 (V)
+south : +0 (I)
+east  : +5 (IV)
+west  : -3 (vi)
 Right:
-   north : +11 (vii)
-   south : +4  (iii)
-   east  : +12 (I)
-   west  : +7  (V)
+north : +11 (vii)
+south : +4  (iii)
+east  : +12 (I)
+west  : +7  (V)
 */
 
 // Helpful to determine quadrant
@@ -202,7 +211,7 @@ fun void quadrant_output(float axis[]) {
     right n s e w
     6 2 7 4
     */
-
+    
     // assign noteSelector to select notes of scale
     // Left
     if (axisDiff[0] > 0) {
@@ -226,15 +235,15 @@ fun void quadrant_output(float axis[]) {
         if (axis[3] > 0) 
             14 => noteSelector[1]; //east
         else              
-            18 => noteSelector[1]; //west
+            11 => noteSelector[1]; //west
     }
     
     // Gain = absolute differences * axis[2 or 5]
     // Boundaries padded by mute zone
     for (0 => int i; i < 2; i++) {
         3 * i + 2 => int pullAxis;
-        if (Math.fabs(axisDiff[i]) > 0.05) {
-            axis[pullAxis] * Math.fabs(axisDiff[i]) => setGain[i];
+        if (Math.fabs(axisDiff[i]) > 0.05 && axis[pullAxis] > DEADZONE) {
+            (axis[pullAxis] - DEADZONE) / (1-DEADZONE) * Math.fabs(axisDiff[i]) => setGain[i];
             // Could have mapped "... * (Math.fabs(axisDiff[i]) - 0.05) / 0.95
         } else {
             0 => setGain[i];
@@ -252,6 +261,8 @@ spork ~ gametrak();
 
 100::ms => dur TEMPO;
 
+spork ~ vibrate();
+
 // infinite time loop
 while( true ) {
     
@@ -259,23 +270,38 @@ while( true ) {
     serverGain * setGain[0] => osc1.gain;
     serverGain * setGain[1] => osc2.gain;
     
-    <<< scale, noteSelector[0], noteSelector[1] >>>;
-
+    //<<< scale, noteSelector[0], noteSelector[1] >>>;
+    
     (12 * (octaveOffset + (noteSelector[0] / 7))) + scales[scale][noteSelector[0] % 7] => Std.mtof => osc1.freq;
     (12 * (octaveOffset + (noteSelector[1] / 7))) + scales[scale][noteSelector[1] % 7] => Std.mtof => osc2.freq;
     
     //<<< addPitch[0], addPitch[1] >>>;
     //<<< setGain[0], setGain[1] >>>;
     //<<< axisDiff[0], axisDiff[1] >>>;
+    
+    
+    
+    TEMPO => now;
+}
 
+fun void vibrate() {
+    /*
     if (vibrato == 1) {
         0.02 => c.modDepth;
     } else {
         0 => c.modDepth;
     }
+    */
     
-    TEMPO => now;
+    0 => float T;
+    
+    while (true) {
+        
+        Math.fabs(Math.sin(T)) * 0.015 => c.modDepth;
+        
+//        <<< Math.fabs(Math.sin(T)) * 0.01 >>>;
+        
+        45::ms => now;
+        T + (2 * Math.PI / 360) => T; 
+    }
 }
-
-
-

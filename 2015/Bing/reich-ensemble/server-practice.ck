@@ -53,9 +53,9 @@ if( HOSTS.size() == 0 )
     */
 
     // HOSTS << "chowder.local";
-    HOSTS << "albacore.local";
-    HOSTS << "banhmi.local";
-    HOSTS << "lasagna.local";
+    //HOSTS << "albacore.local";
+    //HOSTS << "banhmi.local";
+    //HOSTS << "lasagna.local";
 }
 
 // number of targets
@@ -112,7 +112,7 @@ while( true )
 
     (count + 1) % nBeats => count;
 
-    <<< TEMPO, count >>>;
+    //<<< TEMPO, count >>>;
     
     // wait
     TEMPO => now;

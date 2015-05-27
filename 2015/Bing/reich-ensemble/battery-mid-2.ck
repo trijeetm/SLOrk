@@ -29,6 +29,7 @@ spork ~ handleKeyboard();
 0 => int count;
 
 true => int pause;
+true => int _pause;
 
 // percussion control
 Gain masterGain;
@@ -45,9 +46,8 @@ SndBuf percSamples[nSamples];
 
 for (0 => int i; i < 1; i++) {
     for (0 => int j; j < nBeatPeriods; j++)
-        if (j == nBeatPeriods - 1)
-            0.5 => percProbabilities[i][j];
-    0.5 => percGains[i].gain;
+        0 => percProbabilities[i][j];
+    0 => percGains[i].gain;
     0 => percRev[i].mix;
 
     dirRoot + sampleFiles[i] => string sampleSrc;
@@ -138,7 +138,7 @@ fun void play(float pitch) {
             percProbabilities[i][j] => float prob;
             0 => float _gain;
 
-            <<< j, prob, inputGain, percRev[i].mix() >>>;
+            <<< j + 1, prob, inputGain, percRev[i].mix() >>>;
 
             if (count % nBeats == 0) {
                 percProbabilities[i][j] * 4 => prob;            
@@ -162,9 +162,12 @@ fun void play(float pitch) {
                 inputGain * Math.random2f(0.4, 0.5) => _gain;
             }
 
+            if (count == 0)
+                pause => _pause;
+
             if ((j == nBeatPeriods - 1) || (count % (nBeats / Math.pow(2, j)) == 0)) {
                 // <<< count >>>;
-                if ((Math.random2f(0, 1) < prob) && !pause) {
+                if ((Math.random2f(0, 1) < prob) && !_pause) {
                     _gain => percGains[i].gain;
                     playPerc(i);
                 }
@@ -172,6 +175,8 @@ fun void play(float pitch) {
         }
     }
 }
+
+false => int SHIFT_TOGGLE;
 
 fun void handleKeyboard() {
     // infinite event loop
@@ -190,6 +195,9 @@ fun void handleKeyboard() {
                 // <<< "down:", msg.which >>>;
 
                 msg.which => int key;
+
+                if (key == 225)
+                    true => SHIFT_TOGGLE;
 
                 // period selector
                 if (key == 30) {
@@ -210,36 +218,54 @@ fun void handleKeyboard() {
 
                 // rev
                 if (key == 29) {
-                    if (percRev[instrument].mix() > 0) {
+                    if (SHIFT_TOGGLE == true) {
+                        0 => percRev[instrument].mix;
+                    }
+                    else if (percRev[instrument].mix() > 0) {
                         percRev[instrument].mix() - 0.0025 => percRev[instrument].mix;
                     }
                 }
                 if (key == 27) {
-                    if (percRev[instrument].mix() < 1) {
+                    if (SHIFT_TOGGLE == true) {
+                        0.25 => percRev[instrument].mix;
+                    }
+                    else if (percRev[instrument].mix() < 0.25) {
                         0.0025 + percRev[instrument].mix() => percRev[instrument].mix;
                     }
                 }
 
                 // prob
                 if (key == 48) {
-                    if (percProbabilities[instrument][beatPeriod] < 1) {
+                    if (SHIFT_TOGGLE == true) {
+                        1 => percProbabilities[instrument][beatPeriod];
+                    }
+                    else if (percProbabilities[instrument][beatPeriod] < 1) {
                         0.025 + percProbabilities[instrument][beatPeriod] => percProbabilities[instrument][beatPeriod];
                     }
                 }
                 if (key == 47) {
-                    if (percProbabilities[instrument][beatPeriod] > 0) {
+                    if (SHIFT_TOGGLE == true) {
+                        0 => percProbabilities[instrument][beatPeriod];
+                    }
+                    else if (percProbabilities[instrument][beatPeriod] > 0) {
                         percProbabilities[instrument][beatPeriod] - 0.025 => percProbabilities[instrument][beatPeriod];
                     }
                 }
 
                 // gain
                 if (key == 46) {
-                    if (inputGain < 1) {
+                    if (SHIFT_TOGGLE == true) {
+                        1 => inputGain;
+                    }
+                    else if (inputGain < 1) {
                         0.025 + inputGain => inputGain;
                     }
                 }
                 if (key == 45) {
-                    if (inputGain > 0) {
+                    if (SHIFT_TOGGLE == true) {
+                        0 => inputGain;
+                    }
+                    else if (inputGain > 0) {
                         inputGain - 0.025 => inputGain;
                     }
                 }
@@ -264,6 +290,8 @@ fun void handleKeyboard() {
             {
                 // print
                 // <<< "up:", msg.which >>>;
+                if (msg.which == 225)
+                    false => SHIFT_TOGGLE;
             }
         }
     }

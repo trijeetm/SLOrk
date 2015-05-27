@@ -263,12 +263,29 @@ spork ~ gametrak();
 
 spork ~ vibrate();
 
+0 => float osc1_gain;
+0 => float osc2_gain;
+0 => float _osc1_gain;
+0 => float _osc2_gain;
+
+fun void slewGain() {
+    .1 => float slew;
+    while( true )
+    {
+        (osc1_gain - _osc1_gain) * slew + _osc1_gain => _osc1_gain => osc1.gain;
+        (osc2_gain - _osc2_gain) * slew + _osc2_gain => _osc2_gain => osc2.gain;
+        1::ms => now;
+    }
+}
+
+spork ~ slewGain();
+
 // infinite time loop
 while( true ) {
     
     // Set gain and pitch depending on quadrant function
-    serverGain * setGain[0] => osc1.gain;
-    serverGain * setGain[1] => osc2.gain;
+    serverGain * setGain[0] => osc1_gain;
+    serverGain * setGain[1] => osc2_gain;
     
     //<<< scale, noteSelector[0], noteSelector[1] >>>;
     

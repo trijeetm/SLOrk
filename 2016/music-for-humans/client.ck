@@ -103,9 +103,9 @@ fun void keyboard() {
 
                 // rate
                 if (key == 80) 
-                    snaps[currSnap].rampRate(-0.01);
+                    snaps[currSnap].rampRate(-0.0025);
                 if (key == 79) 
-                    snaps[currSnap].rampRate(0.01);
+                    snaps[currSnap].rampRate(0.0025);
 
                 // rev
                 if (key == 54) 

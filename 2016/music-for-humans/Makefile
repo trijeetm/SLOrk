@@ -7,4 +7,4 @@ music:
 	chuck $(CLASSES) client.ck
 
 multi_music: 
-	chuck --out:8 $(CLASSES) client.ck
+	chuck --out:6 $(CLASSES) client.ck

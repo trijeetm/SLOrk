@@ -1,11 +1,14 @@
 LiveSampler sampler;
 
+false => int sustain;
+
 main();
 
 fun void main() {
     sampler.init();
 
     spork ~ gametrak();
+    spork ~ keyboard();
 
     while (true) 1::second => now;
 }
@@ -91,32 +94,119 @@ fun void gametrak() {
                     }
                 }
 
-                // hook up gametrack values 
-                // left hand
-                sampler.setGain(Math.pow(gt.axis[2], 0.5));
-                ((gt.axis[0] + 1) / 2) * 1::second + 50::ms => dur fireRate;
-                sampler.setFireRate(fireRate);
+                if (sustain == false) {
+                    // hook up gametrack values 
+                    // left hand
+                    sampler.setGain(Math.pow(gt.axis[2], 0.5));
+                    ((gt.axis[0] + 1) / 2) * 1::second + 50::ms => dur fireRate;
+                    sampler.setFireRate(fireRate);
 
-                // right hand
-                sampler.setRate(Math.pow(gt.axis[5], 0.25));
-                // sampler.setLength((gt.axis[3] + 1) / 2);
-                // sampler.setPos((gt.axis[4] + 1) / 2);
+                    // right hand
+                    sampler.setPos((gt.axis[3] + 1) / 2);
+                    // sampler.setLength((gt.axis[4] + 1) / 2);
+                    sampler.setRate(Math.pow(gt.axis[5], 0.25));
+                    
+                }
             }
             
             // joystick button down
             else if( msg.isButtonDown() )
             {
                 <<< "button", msg.which, "down" >>>;
-                sampler.pause();
-                sampler.startSampling();
+                if (sustain == false)
+                    true => sustain;
+                else 
+                    false => sustain;
+                // sampler.pause();
+                // sampler.startSampling();
             }
             
             // joystick button up
             else if( msg.isButtonUp() )
             {
                 <<< "button", msg.which, "up" >>>;
-                sampler.stopSampling();
-                sampler.play();
+                // sampler.stopSampling();
+                // sampler.play();
+            }
+        }
+    }
+}
+
+fun void keyboard() {
+/*
+    ---------------------
+    | mapping           |
+    ---------------------
+    | up:       82      |
+    | down:     81      |
+    | left:     80      |
+    | right:    79      |
+    ---------------------
+    | 1 - 5:    30 - 34 |
+    | <:        54      |
+    | >:        55      |
+    | q:        20      |
+    | w:        26      |
+    | e:        8       |
+    | r:        21      |
+    | ;:        51      |
+    | ':        52      |
+    | a:        4       |
+    | s:        22      |
+    | d:        7       |
+    | f:        9       |
+    | g:        10      |
+    | h:        11      |
+    | j:        13      |
+    | k:        14      |
+    | l:        15      |
+    | -:        45      |
+    | +:        46      |
+    | z:        29      |
+    | x:        27      |
+    | c:        6       |
+    | v:        25      |
+    ---------------------
+    44 space   
+    ---------------------   
+*/
+
+    // the device number to open
+    0 => int deviceNum;
+
+    // instantiate a HidIn object
+    HidIn hi;
+    // structure to hold HID messages
+    HidMsg msg;
+
+    // open keyboard
+    if (!hi.openKeyboard(deviceNum)) me.exit();
+    // successful! print name of device
+    <<< "keyboard '", hi.name(), "' ready" >>>;
+
+    // infinite event loop
+    while (true) {
+        // wait on event
+        hi => now;
+
+        // get one or more messages
+        while (hi.recv(msg)){
+            msg.which => int key;
+            // <<< "key: ", key >>>;
+
+            // check for action type
+            if (msg.isButtonDown()) {
+                if (key == 44) {
+                    sampler.pause();
+                    sampler.startSampling();
+                }
+
+            }
+            else {
+                if (key == 44) {
+                    sampler.stopSampling();
+                    sampler.play();
+                }
             }
         }
     }

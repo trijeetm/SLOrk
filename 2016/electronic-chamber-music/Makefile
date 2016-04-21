@@ -13,4 +13,5 @@ snaps:
 	chuck $(CLASSES) snapstrument.ck
 
 uninstrument: 
+	rm -f mic-sample.wav
 	chuck class.live-sampler.ck uninstrument.ck

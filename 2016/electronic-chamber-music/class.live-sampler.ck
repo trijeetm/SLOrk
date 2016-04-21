@@ -26,11 +26,11 @@ public class LiveSampler {
     fun void init() {
         adc => sampler => rev => master => dac;
 
-        sampler.duration(1::second);
+        sampler.duration(duration);
         sampler.maxVoices(200);
         sampler.recRamp(20::ms);
 
-        0.1 => rev.mix;
+        0.2 => rev.mix;
         0 => master.gain;
     }
 

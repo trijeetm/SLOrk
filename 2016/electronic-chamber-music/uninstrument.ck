@@ -99,8 +99,8 @@ fun void gametrak() {
 
                 // right hand
                 sampler.setRate(Math.pow(gt.axis[5], 0.25));
-                sampler.setLength((gt.axis[3] + 1) / 2);
-                sampler.setPos((gt.axis[4] + 1) / 2);
+                // sampler.setLength((gt.axis[3] + 1) / 2);
+                // sampler.setPos((gt.axis[4] + 1) / 2);
             }
             
             // joystick button down

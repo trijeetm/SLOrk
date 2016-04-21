@@ -6,7 +6,7 @@ main();
 
 fun void main() {
     Metronome metro;
-    metro.setup(90, 4, 4);
+    metro.setup(120, 4, 4);
 
     snaps[0].init(metro, 1);
     snaps[1].init(metro, 2);

@@ -12,24 +12,22 @@ public class LiveSampler {
     false => int isSampling;
     false => int isPlaying;
     true => int loading;
+    false => int modulating;
     NRev rev;
     Gain master;
 
     // granulator parameters
-    3::second => dur duration;
+    1::second => dur duration;
     duration => dur length;
     0::second => dur position;
     1 => float rate;
     100::ms => dur rampUp;
     100::ms => dur rampDown;
-    duration => dur fireRate;
+    length => dur fireRate;
 
     fun void init() {
-        // adc => sampler => rev => master => dac;
         sampler => rev => master => dac;
 
-        // sampler.duration(duration);
-        // sampler.recRamp(20::ms);
         sampler.maxVoices(200);
 
         0.2 => rev.mix;
@@ -37,22 +35,15 @@ public class LiveSampler {
     }
 
     fun void sample() {
-        /*
-        sampler.record(1);
-
-        while (isSampling) {
-            512::samp => now;
-        }
-
-        sampler.record(0);
-        */
-
         record();
 
         SndBuf buff;
         me.dir() + "mic-sample.wav" => buff.read;
 
         buff.samples()::samp => sampler.duration;
+        buff.samples()::samp => duration;
+        buff.samples()::samp => length;
+        buff.samples()::samp => fireRate;
 
         for (0 => int i; i < buff.samples(); i++) {
             (buff.valueAt(i), i::samp) => sampler.valueAt;
@@ -137,6 +128,26 @@ public class LiveSampler {
 
     fun void fireGrain() {
         spork ~ grain();
+    }
+
+    fun void hold() {
+        true => modulating;
+
+        spork ~ fade();
+    }
+
+    fun void release() {
+        false => modulating;
+    }
+
+    fun void fade() {
+        master.gain() => float start;
+        (start / (30 * 100)) => float step;
+
+        while (modulating) {
+            setGain(master.gain() - step);
+            1::ms => now;
+        }
     }
 
     fun void grain() {

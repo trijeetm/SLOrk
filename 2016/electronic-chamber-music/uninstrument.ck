@@ -102,7 +102,7 @@ fun void gametrak() {
                     sampler.setFireRate(fireRate);
 
                     // right hand
-                    sampler.setPos((gt.axis[3] + 1) / 2);
+                    sampler.setPos((gt.axis[3] + 1) / 5);
                     // sampler.setLength((gt.axis[4] + 1) / 2);
                     sampler.setRate(Math.pow(gt.axis[5], 0.25));
                     
@@ -113,10 +113,14 @@ fun void gametrak() {
             else if( msg.isButtonDown() )
             {
                 <<< "button", msg.which, "down" >>>;
-                if (sustain == false)
+                if (sustain == false) {
                     true => sustain;
-                else 
+                    sampler.hold();
+                }
+                else {
                     false => sustain;
+                    sampler.release();
+                }
                 // sampler.pause();
                 // sampler.startSampling();
             }

@@ -1,23 +1,18 @@
-// chuck this with other shreds to record to file
-// example> chuck foo.ck bar.ck rec (see also rec2.ck)
+SinOsc s => ADSR e => Chorus c => dac;
 
-// arguments: rec:<filename>
+440 => s.freq;
 
-// get name
-me.arg(0) => string filename;
-if( filename.length() == 0 ) "foo.wav" => filename;
+e.set(300::ms, 300::ms, 1, 500::ms);
 
-// pull samples from the dac
-adc => Gain g => WvOut w => blackhole;
-// this is the output file name
-filename => w.wavFilename;
-<<<"writing to file:", "'" + w.filename() + "'">>>;
-// any gain you want for the output
-.5 => g.gain;
+0.1 => c.modFreq;
+0.5 => c.mix;
+1 => c.modDepth;
 
-// temporary workaround to automatically close file on remove-shred
-null @=> w;
 
-// infinite time loop...
-// ctrl-c will stop it, or modify to desired duration
-while( true ) 1::second => now;
+while (true) {
+  <<< c.mix(), c.modFreq(), c.modDepth() >>>;
+  e.keyOn();
+  300::ms => now;
+  e.keyOff();
+  500::ms => now;
+}

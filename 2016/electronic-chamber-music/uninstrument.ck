@@ -102,9 +102,9 @@ fun void gametrak() {
                     sampler.setFireRate(fireRate);
 
                     // right hand
-                    sampler.setPos((gt.axis[3] + 1) / 5);
+                    sampler.setPos((gt.axis[3] + 1) / 4);
                     // sampler.setLength((gt.axis[4] + 1) / 2);
-                    sampler.setRate(Math.pow(gt.axis[5], 0.25));
+                    sampler.setRate(Math.pow(gt.axis[5], 0.75) * 2);
                     
                 }
             }

@@ -15,23 +15,45 @@ public class LiveSampler {
     false => int modulating;
     NRev rev;
     Gain master;
+    Chorus chorus;
 
     // granulator parameters
     1::second => dur duration;
     duration => dur length;
     0::second => dur position;
     1 => float rate;
+    0 => float rateMod;
     100::ms => dur rampUp;
     100::ms => dur rampDown;
     length => dur fireRate;
 
     fun void init() {
-        sampler => rev => master => dac;
+        sampler => chorus => rev => master => dac;
+
+        spork ~ vibrato();
 
         sampler.maxVoices(200);
 
+        0 => chorus.modDepth;
+        6 => chorus.modFreq;
+        0.5 => chorus.mix;
+
         0.2 => rev.mix;
         0 => master.gain;
+    }
+
+    fun void vibrato() {
+        0.0001 => float delta;
+        while (true) {
+            delta + chorus.modDepth() => chorus.modDepth;
+
+            if (chorus.modDepth() >= 0.1 - Math.fabs(delta))
+                (-0.0001) => delta;
+            if (chorus.modDepth() <= Math.fabs(delta))
+                0.0001 => delta;
+
+            10::ms => now;
+        }
     }
 
     fun void sample() {
@@ -134,28 +156,69 @@ public class LiveSampler {
         true => modulating;
 
         spork ~ fade();
+        spork ~ wobble();
+        spork ~ modulate();
     }
 
     fun void release() {
         false => modulating;
     }
+    
+    fun void wobble() {
+        (-1)::ms => dur delta;
+
+        while (modulating) {
+            if (fireRate <= 10::ms)
+                1::ms => delta;
+            if (fireRate >= 400::ms) 
+                (-1)::ms => delta;
+
+            delta +=> fireRate;
+            
+            20::ms => now;
+        }
+    }
+    
+    fun void modulate() {
+        500::ms => dur period;
+        
+        0::samp => dur t;
+        1::ms => dur step;
+        
+        while (modulating) {
+            Math.fabs(Math.sin(t / period)) * 0.2 => rateMod;
+            
+            t + step => t;
+            step => now;
+        }
+    }
 
     fun void fade() {
         master.gain() => float start;
-        (start / (30 * 100)) => float step;
+        (start / (60 * 1000)) => float step;
 
         while (modulating) {
             setGain(master.gain() - step);
             1::ms => now;
+            
+            if (master.gain() <= 0) {
+                0 => master.gain;
+                break;
+            }
         }
     }
 
     fun void grain() {
-        <<< master.gain(), fireRate, position, length, rate >>>;
+        if (modulating)
+            <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth(), "SUSTAINED" >>>;
+        else
+            <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth() >>>;
         sampler.getVoice() => int voice;
 
         if (voice > -1) {
-            sampler.rate(voice, rate);
+            
+            
+            sampler.rate(voice, rate + rateMod);
             sampler.loop(voice, 0);
             sampler.playPos(voice, position);
             sampler.rampUp(voice, rampUp);

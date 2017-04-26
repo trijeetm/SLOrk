@@ -23,8 +23,8 @@ public class LiveSampler {
     0::second => dur position;
     1 => float rate;
     0 => float rateMod;
-    100::ms => dur rampUp;
-    100::ms => dur rampDown;
+    0::ms => dur rampUp;
+    0::ms => dur rampDown;
     length => dur fireRate;
 
     fun void init() {
@@ -35,8 +35,8 @@ public class LiveSampler {
         sampler.maxVoices(200);
 
         0 => chorus.modDepth;
-        6 => chorus.modFreq;
-        0.5 => chorus.mix;
+        0 => chorus.modFreq;
+        0 => chorus.mix;
 
         0.2 => rev.mix;
         0 => master.gain;
@@ -120,6 +120,7 @@ public class LiveSampler {
         g => master.gain;
     }
 
+    /*
     fun void play() {
         while (loading)
             512::samp => now;
@@ -139,6 +140,7 @@ public class LiveSampler {
             fireRate => now;
         }
     }
+    */
 
     fun void fireGrain(float l, float p, float r) {
         setLength(l);
@@ -216,9 +218,26 @@ public class LiveSampler {
         sampler.getVoice() => int voice;
 
         if (voice > -1) {
-
-
             sampler.rate(voice, rate + rateMod);
+            sampler.loop(voice, 0);
+            sampler.playPos(voice, position);
+            sampler.rampUp(voice, rampUp);
+            length - (rampUp + rampDown) => now;
+            sampler.rampDown(voice, rampDown);
+            rampDown => now;
+        }
+    }
+
+    fun void trigger(float gain) {
+        setGain(gain);
+        trigger();
+    }
+
+    fun void trigger() {
+        sampler.getVoice() => int voice;
+
+        if (voice > -1) {
+            sampler.rate(voice, rate);
             sampler.loop(voice, 0);
             sampler.playPos(voice, position);
             sampler.rampUp(voice, rampUp);

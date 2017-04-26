@@ -41,7 +41,7 @@ public class Snap {
     false => int r_feedback;
 
     fun void log() {
-        <<< 
+        <<<
             "gain: ", c_gain,
             "rate: ", c_rate,
             "rev: ", rev.mix(),
@@ -58,7 +58,7 @@ public class Snap {
             snap.init("bird-shot.wav");
         else if (type == 3)
             snap.init("snap1.wav");
-        else 
+        else
             snap.init("moan.wav");
 
         // snap.getBuff() => rev => dac;
@@ -68,7 +68,7 @@ public class Snap {
 
         0 => rev.mix;
 
-        // _metro @=> metro;
+        _metro @=> metro;
 
         0 => c_gain;
         1 => c_rate;
@@ -101,7 +101,7 @@ public class Snap {
             if (count % (16 / Math.pow(2, rate - 1)) == 0) {
                 if (motifs[currMotif][playhead] == 1)
                     play(c_gain, c_rate);
-                (playhead + 1) % 16 => playhead;        
+                (playhead + 1) % 16 => playhead;
             }
 
             (count + 1) % 16 => count;

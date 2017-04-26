@@ -41,7 +41,7 @@ public class Snap {
     false => int r_feedback;
 
     fun void log() {
-        <<< 
+        <<<
             "gain: ", c_gain,
             "rate: ", c_rate,
             "rev: ", rev.mix(),
@@ -57,8 +57,8 @@ public class Snap {
         else
             snap.init("snap2.wav");
 
-        snap.getBuff() => rev => dac;
-        //snap.getBuff() => ks => rev => dac;
+        // snap.getBuff() => rev => dac;
+        snap.getBuff() => ks => rev => dac;
 
         tune(60, 64, 67, 71);
 
@@ -93,7 +93,7 @@ public class Snap {
             if (count % (16 / Math.pow(2, rate - 1)) == 0) {
                 if (motifs[currMotif][playhead] == 1)
                     play(c_gain, c_rate);
-                (playhead + 1) % 16 => playhead;        
+                (playhead + 1) % 16 => playhead;
             }
 
             (count + 1) % 16 => count;

@@ -1,5 +1,8 @@
 LiveSampler sampler;
 
+// gametrack
+GameTrak gt;
+
 dur measureLength;
 4 => int subdivisions;
 
@@ -7,7 +10,7 @@ dur measureLength;
 
 false => int envelopeSetMode;
 false => int currentlyRecordingEnvelope;
-float envArr[0];
+[0.0, 1.0, 0.0] @=> float envArr[];
 
 main();
 
@@ -15,6 +18,7 @@ fun void main() {
     spork ~ handleServer();
 
     sampler.init();
+    sampler.setEnvelopeArr(envArr);
 
     // spork ~ gametrak();
     spork ~ keyboard();
@@ -55,8 +59,6 @@ fun void gametrak() {
     0 => int device;
     // get from command line
     if( me.args() ) me.arg(0) => Std.atoi => device;
-    // gametrack
-    GameTrak gt;
 
     // HID objects
     Hid trak;
@@ -109,9 +111,8 @@ fun void gametrak() {
             {
                 <<< "button", msg.which, "down" >>>;
                 if (envelopeSetMode) {
-                    float _envArr[0];
-                    _envArr @=> envArr;
                     true => currentlyRecordingEnvelope;
+                    spork ~ trackEnvelope();
                 }
             }
 
@@ -293,4 +294,22 @@ fun void tickMeasure() {
 
 fun void playSample() {
     sampler.trigger(1);
+}
+
+fun void trackEnvelope() {
+    float _envArr[0];
+    _envArr @=> envArr;
+
+    while (currentlyRecordingEnvelope) {
+        float value;
+        if (gt.axis[2] < 0.5) {
+            gt.axis[2] * 2 => value;
+        }
+        else {
+            1.0 => value;
+        }
+        envArr << value;
+
+        256::samp => now;
+    }
 }

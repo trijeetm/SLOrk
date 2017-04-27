@@ -50,9 +50,9 @@ public class LiveSampler {
             delta + chorus.modDepth() => chorus.modDepth;
 
             if (chorus.modDepth() >= 0.1 - Math.fabs(delta))
-                (-0.0001) => delta;
+            (-0.0001) => delta;
             if (chorus.modDepth() <= Math.fabs(delta))
-                0.0001 => delta;
+            0.0001 => delta;
 
             10::ms => now;
         }
@@ -84,7 +84,7 @@ public class LiveSampler {
         sampleFilename => w.wavFilename;
 
         while (isSampling)
-            512::samp => now;
+        512::samp => now;
 
         w.closeFile();
 
@@ -122,28 +122,6 @@ public class LiveSampler {
         g => master.gain;
     }
 
-    /*
-    fun void play() {
-        while (loading)
-            512::samp => now;
-
-        true => isPlaying;
-
-        spork ~ loop();
-    }
-
-    fun void pause() {
-        false => isPlaying;
-    }
-
-    fun void loop() {
-        while (isPlaying) {
-            fireGrain();
-            fireRate => now;
-        }
-    }
-    */
-
     fun void fireGrain(float l, float p, float r) {
         setLength(l);
         setPos(p);
@@ -173,9 +151,9 @@ public class LiveSampler {
 
         while (modulating) {
             if (fireRate <= 10::ms)
-                1::ms => delta;
+            1::ms => delta;
             if (fireRate >= 400::ms)
-                (-1)::ms => delta;
+            (-1)::ms => delta;
 
             delta +=> fireRate;
 
@@ -214,9 +192,9 @@ public class LiveSampler {
 
     fun void grain() {
         if (modulating)
-            <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth(), "SUSTAINED" >>>;
+        <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth(), "SUSTAINED" >>>;
         else
-            <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth() >>>;
+        <<< "gain: ", master.gain(), "fireRate: ", fireRate / 1::ms, "pos: ", position / duration, "playback: ", rate + rateMod, "Chorus: ", chorus.mix(), chorus.modFreq(), chorus.modDepth() >>>;
         sampler.getVoice() => int voice;
 
         if (voice > -1) {
@@ -251,17 +229,17 @@ public class LiveSampler {
     }
 
     fun void setEnvelopeArr(float envelopeVals[]) {
-      envelopeVals @=> envelopeArr;
+        envelopeVals @=> envelopeArr;
     }
 
     fun void envelope(dur duration) {
-      envelopeArr.cap() => int numEnvSamples;
-      (duration / (numEnvSamples - 1)) => dur envSampleDuration;
-      env.value(envelopeArr[0]);
-      for ( 0 => int i; i < numEnvSamples - 1; i++ ) {
-        env.duration(envSampleDuration);
-        env.target(envelopeArr[i+1]);
-        envSampleDuration => now;
-      }
+        envelopeArr.cap() => int numEnvSamples;
+        (duration / (numEnvSamples - 1)) => dur envSampleDuration;
+        env.value(envelopeArr[0]);
+        for ( 0 => int i; i < numEnvSamples - 1; i++ ) {
+            env.duration(envSampleDuration);
+            env.target(envelopeArr[i+1]);
+            envSampleDuration => now;
+        }
     }
 }

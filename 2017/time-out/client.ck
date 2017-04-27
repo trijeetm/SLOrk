@@ -278,7 +278,7 @@ fun void tickMeasure() {
         "" => string sequenceState;
         for (0 => int j; j < subdivisions; j++) {
             if (i == j) {
-                sequenceState + "[X]" => sequenceState;
+                sequenceState + "[|]" => sequenceState;
             } else if (sequence[j]) {
                 sequenceState + "[•]" => sequenceState;
             } else {

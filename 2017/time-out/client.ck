@@ -5,9 +5,9 @@ dur measureLength;
 
 [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] @=> int sequence[];
 
-false => envelopeSetMode;
-false => currentlyRecordingEnvelope;
-[] @=> float envArr;
+false => int envelopeSetMode;
+false => int currentlyRecordingEnvelope;
+float envArr[0];
 
 main();
 
@@ -109,8 +109,9 @@ fun void gametrak() {
             {
                 <<< "button", msg.which, "down" >>>;
                 if (envelopeSetMode) {
-                  [] @=> envArr;
-                  true => currentlyRecordingEnvelope;
+                    float _envArr[0];
+                    _envArr @=> envArr;
+                    true => currentlyRecordingEnvelope;
                 }
             }
 

@@ -19,7 +19,7 @@ public class LiveSampler {
     Envelope env;
 
     // granulator parameters
-    [1] @=> float envelopeArr;
+    [0.0, 1.0, 0.0] @=> float envelopeArr[];
     1::second => dur duration;
     duration => dur length;
     0::second => dur position;
@@ -40,7 +40,7 @@ public class LiveSampler {
         0 => chorus.modFreq;
         0 => chorus.mix;
 
-        0.2 => rev.mix;
+        0.05 => rev.mix;
         0 => master.gain;
     }
 
@@ -256,11 +256,11 @@ public class LiveSampler {
 
     fun void envelope(dur duration) {
       envelopeArr.cap() => int numEnvSamples;
-      (duration / numEnvSamples) => dur envSampleDuration;
+      (duration / (numEnvSamples - 1)) => dur envSampleDuration;
+      env.value(envelopeArr[0]);
       for ( 0 => int i; i < numEnvSamples - 1; i++ ) {
-        e.value(envelopeArr[i]);
-        e.duration(envSampleDuration);
-        e.target(envelopeArr[i+1]);
+        env.duration(envSampleDuration);
+        env.target(envelopeArr[i+1]);
         envSampleDuration => now;
       }
     }

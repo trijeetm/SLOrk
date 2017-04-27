@@ -16,8 +16,10 @@ public class LiveSampler {
     NRev rev;
     Gain master;
     Chorus chorus;
+    Envelope env;
 
     // granulator parameters
+    [1] @=> float envelopeArr;
     1::second => dur duration;
     duration => dur length;
     0::second => dur position;
@@ -28,7 +30,7 @@ public class LiveSampler {
     length => dur fireRate;
 
     fun void init() {
-        sampler => chorus => rev => master => dac;
+        sampler => env => chorus => rev => master => dac;
 
         spork ~ vibrato();
 
@@ -239,11 +241,27 @@ public class LiveSampler {
         if (voice > -1) {
             sampler.rate(voice, rate);
             sampler.loop(voice, 0);
+            spork ~ envelope(length);
             sampler.playPos(voice, position);
             sampler.rampUp(voice, rampUp);
             length - (rampUp + rampDown) => now;
             sampler.rampDown(voice, rampDown);
             rampDown => now;
         }
+    }
+
+    fun void setEnvelopeArr(float envelopeVals[]) {
+      envelopeVals @=> envelopeArr;
+    }
+
+    fun void envelope(dur duration) {
+      envelopeArr.cap() => int numEnvSamples;
+      (duration / numEnvSamples) => dur envSampleDuration;
+      for ( 0 => int i; i < numEnvSamples - 1; i++ ) {
+        e.value(envelopeArr[i]);
+        e.duration(envSampleDuration);
+        e.target(envelopeArr[i+1]);
+        envSampleDuration => now;
+      }
     }
 }

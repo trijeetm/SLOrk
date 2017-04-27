@@ -5,6 +5,10 @@ dur measureLength;
 
 [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] @=> int sequence[];
 
+false => envelopeSetMode;
+false => currentlyRecordingEnvelope;
+[] @=> float envArr;
+
 main();
 
 fun void main() {
@@ -104,12 +108,21 @@ fun void gametrak() {
             else if( msg.isButtonDown() )
             {
                 <<< "button", msg.which, "down" >>>;
+                if (envelopeSetMode) {
+                  [] @=> envArr;
+                  true => currentlyRecordingEnvelope;
+                }
             }
 
             // joystick button up
             else if( msg.isButtonUp() )
             {
                 <<< "button", msg.which, "up" >>>;
+                false => currentlyRecordingEnvelope;
+                if (envelopeSetMode) {
+                  sampler.setEnvelopeArr(envArr);
+                  false => envelopeSetMode;
+                }
             }
         }
     }
@@ -180,16 +193,20 @@ fun void keyboard() {
 
             // check for action type
             if (msg.isButtonDown()) {
+                // use SPACE to start recording sampler
                 if (key == 44) {
                     /*sampler.pause();*/
                     sampler.startSampling();
                 }
+                // use UP ARROW to fire sampler
                 if (key == 25) {
                     sampler.trigger(1);
                 }
+                // when LSHIFT is pressed, enable shift mode
                 if (key == 225) {
                     true => shiftDn;
                 }
+                // use NUMERIC KEYS to configure sequencer
                 if (30 <= key && key <= 38) {
                     (key - 29) => int seqNum;
                     if (shiftDn) {
@@ -201,6 +218,14 @@ fun void keyboard() {
                             true => sequence[seqNum-1];
                         }
                     }
+                }
+                // use LETTER E to toggle envelope setting mode
+                if (key == 8) {
+                  if (envelopeSetMode) {
+                    false => envelopeSetMode;
+                  } else {
+                    true => envelopeSetMode;
+                  }
                 }
             }
             else {

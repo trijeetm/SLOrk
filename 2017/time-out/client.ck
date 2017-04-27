@@ -1,31 +1,3 @@
-LiveSampler sampler;
-
-// gametrack
-GameTrak gt;
-
-dur measureLength;
-4 => int subdivisions;
-
-[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] @=> int sequence[];
-
-false => int envelopeSetMode;
-false => int currentlyRecordingEnvelope;
-[0.0, 1.0, 0.0] @=> float envArr[];
-
-main();
-
-fun void main() {
-    spork ~ handleServer();
-
-    sampler.init();
-    sampler.setEnvelopeArr(envArr);
-
-    // spork ~ gametrak();
-    spork ~ keyboard();
-
-    while (true) 1::second => now;
-}
-
 // data structure for gametrak
 class GameTrak
 {
@@ -51,6 +23,34 @@ fun void print(GameTrak gt) {
     }
 }
 
+LiveSampler sampler;
+
+// gametrack
+GameTrak gt;
+
+dur measureLength;
+4 => int subdivisions;
+
+[ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] @=> int sequence[];
+
+false => int envelopeSetMode;
+false => int currentlyRecordingEnvelope;
+[0.0, 1.0, 0.0] @=> float envArr[];
+
+main();
+
+fun void main() {
+    spork ~ handleServer();
+
+    sampler.init();
+    sampler.setEnvelopeArr(envArr);
+
+    spork ~ gametrak();
+    spork ~ keyboard();
+
+    while (true) 1::second => now;
+}
+
 fun void gametrak() {
     // z axis deadzone
     .032 => float DEADZONE;
@@ -70,7 +70,7 @@ fun void gametrak() {
     // print
     <<< "joystick '" + trak.name() + "' ready", "" >>>;
 
-    // spork ~ print(gt);
+    /*spork ~ print(gt);*/
 
     while (true) {
         // wait on HidIn as event
@@ -122,8 +122,9 @@ fun void gametrak() {
                 <<< "button", msg.which, "up" >>>;
                 false => currentlyRecordingEnvelope;
                 if (envelopeSetMode) {
-                  sampler.setEnvelopeArr(envArr);
-                  false => envelopeSetMode;
+                    <<< envArr >>>;
+                    sampler.setEnvelopeArr(envArr);
+                    false => envelopeSetMode;
                 }
             }
         }
@@ -287,7 +288,9 @@ fun void tickMeasure() {
                 sequenceState + "[ ]" => sequenceState;
             }
         }
-        <<< sequenceState >>>;
+        if (!currentlyRecordingEnvelope) {
+            <<< sequenceState >>>;
+        }
         measureLength / subdivisions => now;
     }
 }
@@ -308,8 +311,9 @@ fun void trackEnvelope() {
         else {
             1.0 => value;
         }
+        <<< value >>>;
         envArr << value;
 
-        256::samp => now;
+        1024::samp => now;
     }
 }

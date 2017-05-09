@@ -1,0 +1,48 @@
+Synth synth;
+false => int ready;
+0 => int id;
+
+// create our OSC receiver
+OscRecv recv;
+
+main();
+
+fun void main() {
+    Std.atoi(me.arg(0)) => id;
+
+    spork ~ init();
+    spork ~ handleConductor();
+
+    while (true) 1::second => now;
+}
+
+fun void init() {
+    // use port 6449
+    6449 => recv.port;
+    // start listening (launch thread)
+    recv.listen();
+
+    // create an address in the receiver, store in new variable
+    "/player/init/" + id + ", " + "f" => string path;
+    recv.event(path) @=> OscEvent oe;
+
+    // infinite event loop
+    while ( true )
+    {
+        // wait for event to arrive
+        oe => now;
+
+        // grab the next message from the queue.
+        while ( oe.nextMsg() != 0 )
+        {
+            oe.getFloat()::samp => dur baseNoteDur;
+            synth.init(baseNoteDur);
+            true => ready;
+            <<< "player init" >>>;
+        }
+    }
+}
+
+fun void handleConductor() {
+
+}

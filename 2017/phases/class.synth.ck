@@ -14,11 +14,14 @@ public class Synth {
     TriOsc tri => env;
     Noise noise => TwoPole filter => env;
 
+    dur baseNoteDur;
     0::ms => dur noteDur;
 
-    fun void init(dur _noteDur) {
+    fun void init(dur _baseNoteDur) {
+        _baseNoteDur => baseNoteDur;
+
         setNote(48);
-        setDur(_noteDur);
+        setDur(baseNoteDur);
 
         1  => filter.norm;
         0.1 => filter.gain;
@@ -39,9 +42,13 @@ public class Synth {
         _dur => noteDur;
     }
 
-    fun void play(int _note, dur _dur) {
+    fun void setDur(int _len) {
+        _len * baseNoteDur => noteDur;
+    }
+
+    fun void play(int _note, int _len) {
         setNote(_note);
-        setDur(_dur);
+        setDur(_len);
 
         spork ~ _play();
     }

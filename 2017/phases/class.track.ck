@@ -28,8 +28,8 @@ public class Track {
 
         int measure[][];
         [[36, 1], [0, 1], [48, 1], [0, 1], [60, 1], [0, 1], [72, 1], [0, 1]] @=> measure;
-        //seq.addMeasure(measure);
-        //[[36, 4], [0, 1], [0, 1], [0, 1], [60, 1], [0, 1], [63, 1], [0, 1]] @=> measure;
+        seq.addMeasure(measure);
+        [[36, 4], [0, 1], [0, 1], [0, 1], [60, 1], [0, 1], [63, 1], [0, 1]] @=> measure;
         seq.addMeasure(measure);
     }
 
@@ -53,7 +53,9 @@ public class Track {
             metro.eighthNoteTick => now;
 
             if (seq.hasNote()) {
-                synth.play(seq.getNote(), seq.getLength() * metro.getSixteenthBeatDur());
+                // synth.play(seq.getNote(), seq.getLength());
+                triggerPlayer(seq.getNote(), seq.getLength());
+
             }
 
             seq.tick();
@@ -66,5 +68,13 @@ public class Track {
         xmit.startMsg(path, "f");
         lenInFloat => xmit.addFloat;
         <<< "init-ing player" >>>;
+    }
+
+    fun void triggerPlayer(int note, int len) {
+        "/player/trigger/" + id => string path;
+        xmit.startMsg(path, "i i");
+        note => xmit.addInt;
+        len => xmit.addInt;
+        <<< "." >>>;
     }
 }

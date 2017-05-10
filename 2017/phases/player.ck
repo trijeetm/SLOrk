@@ -15,6 +15,8 @@ fun void main() {
     spork ~ init();
     spork ~ handleConductor();
 
+    spork ~ handleSynthGain();
+
     while (true) 1::second => now;
 }
 
@@ -63,6 +65,28 @@ fun void handleConductor() {
                 oe.getInt() => int len;
                 <<< note, len >>>;
                 synth.play(note, len);
+            }
+        }
+    }
+}
+
+fun void handleSynthGain() {
+    // create an address in the receiver, store in new variable
+    "/player/synth/gain/" + id + ", " + "i, i" => string path;
+    recv.event(path) @=> OscEvent oe;
+
+    // infinite event loop
+    while (true) {
+        oe => now;
+
+        if (ready) {
+            // wait for event to arrive
+
+            // grab the next message from the queue.
+            while (oe.nextMsg() != 0) {
+                oe.getInt() => int osc;
+                oe.getInt() => int gain;
+                synth.setOscGain(osc, gain);
             }
         }
     }

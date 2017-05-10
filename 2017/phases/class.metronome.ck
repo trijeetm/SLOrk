@@ -39,13 +39,13 @@ public class Metronome {
         _bpm => bpm;
         _beatNumber => beatNumber;
         _beatMeasure => beatMeasure;
-        4 => beatMeasure; // only supports n/4 time signatures right now
-        ((1 / bpm) / (NOTE_SUBDIVISION / beatMeasure))::minute => quanta;
+        ((1 / bpm) / (NOTE_SUBDIVISION / 4))::minute => quanta;
+        <<< quanta >>>;
     }
 
     fun void updateBpm(float newBpm) {
         newBpm => bpm;
-        ((1 / bpm) / (NOTE_SUBDIVISION / beatMeasure))::minute => quanta;
+        ((1 / bpm) / (NOTE_SUBDIVISION / 4))::minute => quanta;
     }
 
     fun void interpBpm(float start, float end, dur duration) {
@@ -86,7 +86,7 @@ public class Metronome {
     fun int getWholeNoteCount() {
         return (wholeNoteCount % 1) + 1;
     }
-    
+
     // TODO: update for other time signatures
     fun dur getSixteenthBeatDur() {
         return quanta * 1;
@@ -110,11 +110,11 @@ public class Metronome {
     // TODO
 
     fun dur getMeasureDur() {
-        return quanta * (NOTE_SUBDIVISION / beatMeasure) * beatNumber;
+        return (quanta * NOTE_SUBDIVISION) * (beatNumber / beatMeasure);
     }
 
     fun dur getMeasureDur(int nMeasures) {
-        return quanta * (NOTE_SUBDIVISION / beatMeasure) * beatNumber * nMeasures;
+        return (quanta * NOTE_SUBDIVISION) * (beatNumber / beatMeasure) * nMeasures;
     }
 
     fun int getMeasure() {
@@ -134,42 +134,50 @@ public class Metronome {
 
     fun void waitForMeasures(int n) {
         for (0 => int m; m < n; m++)
-            measureTick => now;   
+            measureTick => now;
     }
 
     fun void startTick() {
         while (isMetroOn) {
             // update beat counts and measure
-            if (beatMeasure == 4) {
-                // 1/16th
-                sixteenthNoteCount + 1 => sixteenthNoteCount;
-                sixteenthNoteTick.broadcast();
+            // 1/16th
+            sixteenthNoteCount + 1 => sixteenthNoteCount;
+            sixteenthNoteTick.broadcast();
 
-                // 1/8th
-                if (sixteenthNoteCount % 2 == 0) {
-                    1 +=> eighthNoteCount;
-                    eighthNoteTick.broadcast();
-                }
+            // 1/8th
+            if (sixteenthNoteCount % 2 == 0) {
+                1 +=> eighthNoteCount;
+                eighthNoteTick.broadcast();
 
-                // 1/4th (beat!)
-                if (sixteenthNoteCount % 4 == 0) {
-                    1 +=> quarterNoteCount;
-                    quarterNoteTick.broadcast();
-                    if (quarterNoteCount % beatNumber == 0)
+                if (beatMeasure == 8) {
+                    if (eighthNoteCount % beatNumber == 0) {
                         tickMeasure();
+                    }
                 }
+            }
 
-                // 1/2
-                if (sixteenthNoteCount % 8 == 0) {
-                    1 +=> halfNoteCount;
-                    halfNoteTick.broadcast();
-                }
+            // 1/4th
+            if (sixteenthNoteCount % 4 == 0) {
+                1 +=> quarterNoteCount;
+                quarterNoteTick.broadcast();
 
-                // 1
-                if (sixteenthNoteCount % 16 == 0) {
-                    1 +=> wholeNoteCount;
-                    wholeNoteTick.broadcast();
+                if (beatMeasure == 4) {
+                    if (eighthNoteCount % beatNumber == 0) {
+                        tickMeasure();
+                    }
                 }
+            }
+
+            // 1/2
+            if (sixteenthNoteCount % 8 == 0) {
+                1 +=> halfNoteCount;
+                halfNoteTick.broadcast();
+            }
+
+            // 1
+            if (sixteenthNoteCount % 16 == 0) {
+                1 +=> wholeNoteCount;
+                wholeNoteTick.broadcast();
             }
 
             // fire tick (at sixteenth note quanta)
@@ -180,7 +188,7 @@ public class Metronome {
 }
 
 //     16th
-//  1  2  3  4 
+//  1  2  3  4
 //  5  6  7  8
 //  9 10 11 12
 // 13 14 15 16

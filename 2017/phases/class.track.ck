@@ -16,20 +16,23 @@ public class Track {
     Sequencer seq;
 
     false => int isPlaying;
+    0 => int state;
+
+    0 => int offset;
 
     fun void init(int _id, OscSend _xmit, float bpm) {
         _id => id;
         _xmit @=> xmit;
 
-        metro.setup(bpm, 4, 4);
+        metro.setup(bpm, 12, 8);
 
         initPlayer(metro.getSixteenthBeatDur());
         synth.init(metro.getSixteenthBeatDur());
 
         int measure[][];
-        [[36, 1], [0, 1], [48, 1], [0, 1], [60, 1], [0, 1], [72, 1], [0, 1]] @=> measure;
-        seq.addMeasure(measure);
-        [[36, 4], [0, 1], [0, 1], [0, 1], [60, 1], [0, 1], [63, 1], [0, 1]] @=> measure;
+        [[36, 1], [36, 1], [36, 1], [0, 1], [60, 1], [60, 1], [0, 1], [60, 1], [0, 1], [48, 1], [48, 1], [0, 1]] @=> measure;
+        // int measure[][];
+        // [[36, 1], [36, 1], [36, 1], [60, 1], [60, 1], [60, 1], [60, 1], [60, 1], [60, 1], [48, 1], [48, 1], [60, 1]] @=> measure;
         seq.addMeasure(measure);
     }
 
@@ -37,6 +40,7 @@ public class Track {
         metro.start();
         true => isPlaying;
         spork ~ loop();
+        spork ~ watch();
     }
 
     fun void pause() {
@@ -53,13 +57,34 @@ public class Track {
             metro.eighthNoteTick => now;
 
             if (seq.hasNote()) {
-                // synth.play(seq.getNote(), seq.getLength());
                 triggerPlayer(seq.getNote(), seq.getLength());
-
             }
 
             seq.tick();
         }
+    }
+
+    fun void watch() {
+        while (isPlaying) {
+            metro.measureTick => now;
+
+            <<< metro.getMeasure() >>>;
+            <<< "   track: ", id, "offset: ", seq.getOffset() >>>;
+        }
+    }
+
+    fun void incOffset() {
+        metro.measureTick => now;
+        seq.incOffset();
+    }
+
+    fun void decOffset() {
+        metro.measureTick => now;
+        seq.decOffset();
+    }
+
+    fun void cue(int s) {
+
     }
 
     fun void initPlayer(dur baseNoteLen) {
@@ -75,6 +100,12 @@ public class Track {
         xmit.startMsg(path, "i i");
         note => xmit.addInt;
         len => xmit.addInt;
-        <<< "." >>>;
+    }
+
+    fun void setSynthGain(int osc, int gain) {
+        "/player/synth/gain/" + id => string path;
+        xmit.startMsg(path, "i i");
+        osc => xmit.addInt;
+        gain => xmit.addInt;
     }
 }

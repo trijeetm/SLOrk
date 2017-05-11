@@ -11,7 +11,7 @@ public class Synth {
     ADSR env => dac;
 
     SinOsc sin => env;
-    TriOsc tri => env;
+    SqrOsc sqr => env;
     SawOsc saw => env;
     Noise noise => BiQuad filter => env;
 
@@ -32,18 +32,18 @@ public class Synth {
         1 => filter.eqzs;
 
         0 => sin.gain;
-        0 => tri.gain;
+        0 => sqr.gain;
         0 => saw.gain;
         0 => noise.gain;
 
-        env.set(0.001, 0, 1, 0.1);
+        env.set(0.001, 0, 1, 0.001);
     }
 
     fun void setNote(int note) {
         Std.mtof(note) => float freq;
 
         freq => sin.freq;
-        freq => tri.freq;
+        freq => sqr.freq;
         freq => saw.freq;
         freq * 2 => filter.pfreq;
     }
@@ -59,13 +59,25 @@ public class Synth {
     fun void setOscGain(int osc, int gain) {
         <<< osc, gain >>>;
         if (osc == 0)
-            gain / 127.0 => sin.gain;
+            gain * 1.5 / 127.0 => sin.gain;
         if (osc == 1)
-            gain / 127.0 => tri.gain;
+            gain / 127.0 => sqr.gain;
         if (osc == 2)
             gain / 127.0 => saw.gain;
         if (osc == 3)
             gain / 127.0 => noise.gain;
+    }
+
+    fun void setAttack(int atk) {
+        <<< atk >>>;
+        env.attackTime((atk / 127.0) * noteDur);
+        <<< env.attackTime() >>>;
+    }
+
+    fun void setRelease(int rel) {
+        <<< rel >>>;
+        env.releaseTime((rel / 127.0) * noteDur * 8);
+        <<< env.releaseTime() >>>;
     }
 
     fun void play(int _note, int _len) {

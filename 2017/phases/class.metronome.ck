@@ -48,6 +48,10 @@ public class Metronome {
         ((1 / bpm) / (NOTE_SUBDIVISION / 4))::minute => quanta;
     }
 
+    fun float getBpm() {
+        return bpm;
+    }
+
     fun void interpBpm(float start, float end, dur duration) {
         Interpolator iBpm;
         iBpm.setup(start, end, duration);

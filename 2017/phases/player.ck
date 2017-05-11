@@ -16,6 +16,8 @@ fun void main() {
     spork ~ handleConductor();
 
     spork ~ handleSynthGain();
+    spork ~ handleSynthAttack();
+    spork ~ handleSynthRelease();
 
     while (true) 1::second => now;
 }
@@ -87,6 +89,48 @@ fun void handleSynthGain() {
                 oe.getInt() => int osc;
                 oe.getInt() => int gain;
                 synth.setOscGain(osc, gain);
+            }
+        }
+    }
+}
+
+fun void handleSynthAttack() {
+    // create an address in the receiver, store in new variable
+    "/player/synth/attack/" + id + ", " + "i" => string path;
+    recv.event(path) @=> OscEvent oe;
+
+    // infinite event loop
+    while (true) {
+        oe => now;
+
+        if (ready) {
+            // wait for event to arrive
+
+            // grab the next message from the queue.
+            while (oe.nextMsg() != 0) {
+                oe.getInt() => int atk;
+                synth.setAttack(atk);
+            }
+        }
+    }
+}
+
+fun void handleSynthRelease() {
+    // create an address in the receiver, store in new variable
+    "/player/synth/release/" + id + ", " + "i" => string path;
+    recv.event(path) @=> OscEvent oe;
+
+    // infinite event loop
+    while (true) {
+        oe => now;
+
+        if (ready) {
+            // wait for event to arrive
+
+            // grab the next message from the queue.
+            while (oe.nextMsg() != 0) {
+                oe.getInt() => int rel;
+                synth.setRelease(rel);
             }
         }
     }

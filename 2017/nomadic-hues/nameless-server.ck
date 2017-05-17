@@ -39,27 +39,27 @@ fun void initscales()
 {
   60 => int C;
   61 => int Db;
-  62 => int D; 
+  62 => int D;
   63 => int Eb;
   64 => int E;
-  65 => int F; 
-  66 => int Gb; 
-  67 => int G; 
+  65 => int F;
+  66 => int Gb;
+  67 => int G;
   68 => int Ab;
   69 => int A;
   70 => int Bb;
   71 => int B;
 
-  [C-24, E-24, Gb-24, G-24, B-24, C-12, E-12, Gb-12, G-12, 
+  [C-24, E-24, Gb-24, G-24, B-24, C-12, E-12, Gb-12, G-12,
          E-12, C-12, B-24] @=> hirajoshi;
 
-  [C-24, D-24, E-24, G-24, A-24, C-12, D-12, E-12, G-12, 
+  [C-24, D-24, E-24, G-24, A-24, C-12, D-12, E-12, G-12,
          E-12, D-12, C-24] @=> pentatonic;
 
-  [A-36, C-24, E-24, A-24, C-12, D-12, E-12, A-12, E-12, 
+  [A-36, C-24, E-24, A-24, C-12, D-12, E-12, A-12, E-12,
          C-12, B-24, A-24] @=> aminor;
 
-  [D-36, A-36, C-24, D-24, F-24, A-12, D-12, A-12, F-12, 
+  [D-36, A-36, C-24, D-24, F-24, A-12, D-12, A-12, F-12,
          D-12, A-24, D-24] @=> dminor;
 
   [D-24, E-24, G-24, A-24, C-12, D-12, E-12, G-12, E-12,
@@ -95,7 +95,7 @@ OscSend graphicsXmit;
 4242 => int graphicsPort;
 
 // aim the transmitter at port
-graphicsXmit.setHost("localhost", graphicsPort); 
+graphicsXmit.setHost("localhost", graphicsPort);
 
 //create Xmitter
 Xmitter xmit;
@@ -107,7 +107,7 @@ OscRecv recv;
 
 /************************************************************************ MIDI */
 
-0 => int device;
+1 => int device;
 // the midi event
 MidiIn min;
 // the message for retrieving data
@@ -134,7 +134,7 @@ fun void waitForHeartbeats()
   {
     //alive check
     true => int allAlive;
- 
+
     <<< "." >>>;
     for (int i; i < isAlive.cap(); i++)
     {
@@ -187,7 +187,7 @@ fun void timeout()
     for (int id; id < xmit.targets(); id++)
     {
       //no communication in past THRESHOLD and they are ACTIVE on the grid
-      if (positions[id].lastMsg + TIMEOUT_THRESH < now 
+      if (positions[id].lastMsg + TIMEOUT_THRESH < now
                          && grid[idToIdx(id)].who[id] != 0)
       {
         spork ~timeoutHandler(id);
@@ -202,7 +202,7 @@ fun void timeoutHandler(int id)
   <<< id, "has timed out" >>>;
 
   0 => grid[idToIdx(id)].who[id];
-  
+
   //do graphics update.
   g_hidePlayer(id);
   g_cellFadeOut(id, positions[id].x, positions[id].y, positions[id].whichEnv);
@@ -215,7 +215,7 @@ fun int idToIdx(int id)
   return positions[id].y*width+positions[id].x;
 }
 
-fun void printGridCell(GridCell @ var) 
+fun void printGridCell(GridCell @ var)
 {
   <<< "p:", var.pitch, " o: ", var.isOccupied() >>>;
 }
@@ -227,7 +227,7 @@ fun void printPlayerState(int id, PlayerState @ pos) {
 fun void gridinit(int which) {
   int scale[];
 
-  if (which == HIRAJOSHI) 
+  if (which == HIRAJOSHI)
   {
     hirajoshi @=> scale;
     <<< "Scale: HIRAJOSHI" >>>;
@@ -237,7 +237,7 @@ fun void gridinit(int which) {
   {
     pentatonic @=> scale;
     <<< "Scale: PENTATONIC" >>>;
-  } 
+  }
 
   if (which == AMINOR)
   {
@@ -265,17 +265,17 @@ fun void gridinit(int which) {
 
   g_updateWorld(which);
 
-  for( 0 => int y; y < height; y++ ) 
+  for( 0 => int y; y < height; y++ )
   {
-    for( 0 => int x; x < width; x++ ) 
+    for( 0 => int x; x < width; x++ )
     {
       //calculate index
       y*width + x => int idx;
       if (y > height / 2)
       {
         scale[x] + (height - y) * 12 => grid[idx].pitch;
-      } 
-      else 
+      }
+      else
       {
         scale[x] + y * 12 => grid[idx].pitch;
       }
@@ -322,14 +322,14 @@ fun void mutateSaturation(int delta) {
 fun string printGrid(int id, int targetIdx) {
 
   "----------------------------\n" => string result;
-  for( height - 1 => int y; y >= 0; y--) 
+  for( height - 1 => int y; y >= 0; y--)
   {
-    for( 0 => int x; x < width; x++ ) 
+    for( 0 => int x; x < width; x++ )
     {
       //calculate index
       y*width + x => int idx;
 
-      if (grid[idx].isOccupied()) 
+      if (grid[idx].isOccupied())
       {
         if (targetIdx == idx && (grid[idx].who[id] != 0))
         {
@@ -351,14 +351,14 @@ fun string printGrid(int id, int targetIdx) {
 }
 
 fun void updateClient(int z) {
-  positions[z] @=> PlayerState curPlayer; 
+  positions[z] @=> PlayerState curPlayer;
  // printPlayerState(z, curPlayer);
 
   // start the message...
   //id midi h s v grid a d s r
   xmit.at(z).startMsg( "/slork/synch/synth", "i i i i i s i i f i" );
 
-  // a message is kicked as soon as it is complete 
+  // a message is kicked as soon as it is complete
   // - type string is satisfied and bundles are closed
   z                                            => xmit.at(z).addInt;
   grid[curPlayer.y*width+curPlayer.x].pitch    => xmit.at(z).addInt;
@@ -372,7 +372,7 @@ fun void updateClient(int z) {
   attackMs[curPlayer.whichEnv]    => xmit.at(z).addInt;
   decayMs[curPlayer.whichEnv]     => xmit.at(z).addInt;
   sustainGain[curPlayer.whichEnv] => xmit.at(z).addFloat;
-  releaseMs[curPlayer.whichEnv]   => xmit.at(z).addInt; 
+  releaseMs[curPlayer.whichEnv]   => xmit.at(z).addInt;
 }
 
 fun void sendBass(int midiNote) {
@@ -383,7 +383,7 @@ fun void sendBass(int midiNote) {
     xmit.basses()[z] => int subwoofer_idx;
 
     //hack to make local work
-    if (subwoofer_idx >= 0) 
+    if (subwoofer_idx >= 0)
     {
       xmit.at(subwoofer_idx).startMsg( "/slork/synch/bass", "i" );
       midiNote => xmit.at(subwoofer_idx).addInt;
@@ -406,7 +406,7 @@ fun void sendKnob(int whichKnob, int value)
 
 
 fun void updateClients() {
-  for( 0 => int z; z < xmit.targets(); z++ ) 
+  for( 0 => int z; z < xmit.targets(); z++ )
   {
     updateClient(z); //no need to spork
   }
@@ -417,7 +417,7 @@ fun void sendClock() {
   {
     for (int z; z < xmit.targets(); z++)
     {
-      // a message is kicked as soon as it is complete 
+      // a message is kicked as soon as it is complete
       xmit.at(z).startMsg( "/slork/synch/clock", "i i");
       z => xmit.at(z).addInt;
 
@@ -448,7 +448,7 @@ fun void handleClient() {
       //<<< id, dY, dX >>>;
 
       //they are leaving the grid, send a fade out message
-      if (dY == 0 && dX == 0 
+      if (dY == 0 && dX == 0
                   && grid[idToIdx(id)].who[id] == 1)
       {
         //unset occupied for old position
@@ -473,7 +473,7 @@ fun void handleClient() {
       if (positions[id].x > width - 1) {
         0 => positions[id].x;
         1 => didTeleport;
-      } 
+      }
       if (positions[id].x < 0) {
         width - 1 => positions[id].x;
         1 => didTeleport;
@@ -489,7 +489,7 @@ fun void handleClient() {
       }
       if (positions[id].y < 0) {
         height - 1 => positions[id].y;
-        2 => didTeleport; 
+        2 => didTeleport;
       }
 
       //write last communiation time into positions array
@@ -498,7 +498,7 @@ fun void handleClient() {
       1 => grid[idToIdx(id)].who[id];
 
       // update player graphics
-      if (didTeleport == 0) 
+      if (didTeleport == 0)
         spork ~g_showPlayer(id);
       spork ~g_updatePlayer(id, didTeleport);
 
@@ -558,7 +558,7 @@ fun void slewIdxColor(int z, int hue)
   hue - color.h       => int hueDelta;
 
   //complicated math
-  if (Math.abs(hueDelta) >= 180) 
+  if (Math.abs(hueDelta) >= 180)
   {
     if (hueDelta < 0)
     {
@@ -573,7 +573,7 @@ fun void slewIdxColor(int z, int hue)
 
   (hueDelta $ float )/ numSteps   => float stepSize;
 
-  //keep accurate sum in sum, but cast down to appropriate hue 
+  //keep accurate sum in sum, but cast down to appropriate hue
   color.h $ float                 => float sum;
 
   for (int i; i < numSteps; i++)
@@ -586,7 +586,7 @@ fun void slewIdxColor(int z, int hue)
     if (sum $ int == color.h) break;
 
     //cast down
-    sum $ int => color.h; 
+    sum $ int => color.h;
 
     //let everyone know some slewing has occured!
     spork ~updateClient(z);
@@ -605,8 +605,8 @@ fun void slewIdxColor(int z, int hue)
 
 
 fun void slewColors(int hue) {
-  for( 0 => int z; z < xmit.targets(); z++ ) 
-  {  
+  for( 0 => int z; z < xmit.targets(); z++ )
+  {
     //calculate index
     if (HSV.isWarm(hue))
     {
@@ -709,7 +709,7 @@ fun void g_updateColor(int id) {
 fun void g_updateWorld(int which) {
   int h, s, b;
 
-  if (which == HIRAJOSHI) 
+  if (which == HIRAJOSHI)
   {
     0 => h;
     10 => s;
@@ -721,7 +721,7 @@ fun void g_updateWorld(int which) {
     0 => h;
     61 => s;
     100 => b;
-  } 
+  }
 
   if (which == AMINOR)
   {
@@ -854,7 +854,7 @@ fun void keyboard()
         // bass sending
 
         //sectin changes
-        if (msg.which >= 30 && msg.which <= 39) 
+        if (msg.which >= 30 && msg.which <= 39)
         {
           //constrain input to 1-0
           spork ~changeSection(msg.which - 29);
@@ -893,7 +893,7 @@ fun void midi()
     {
       // print out midi message with id
       <<< "device", device, ":", msg.data1, msg.data2, msg.data3 >>>;
-      
+
       //key down
       if (msg.data1 == 128)
       {
@@ -998,7 +998,7 @@ fun void changeSection(int WHICH)
 
 /******************************************************************** Control */
 
-//initialize the xmit 
+//initialize the xmit
 xmit.init(me.arg(0));
 
 //init other globals

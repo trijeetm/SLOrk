@@ -15,10 +15,17 @@ fun void main() {
     tracks[1].init(1, xmitters[1], 200);
     tracks[1].play();
 
-    /*
     tracks[2].init(2, xmitters[2], 200);
     tracks[2].play();
-    */
+
+    tracks[3].init(3, xmitters[3], 200);
+    tracks[3].play();
+
+    tracks[4].init(4, xmitters[4], 200);
+    tracks[4].play();
+
+    tracks[5].init(5, xmitters[5], 200);
+    tracks[5].play();
 
     while (true) 1::second => now;
 }
@@ -28,12 +35,12 @@ fun void initNetwork() {
     string HOSTS[0];
     6449 => int port;
 
-    HOSTS << "localhost";
-    HOSTS << "localhost";
-    HOSTS << "localhost";
-    HOSTS << "localhost";
-    HOSTS << "localhost";
-    HOSTS << "localhost";
+    HOSTS << "chowder.local";
+    HOSTS << "quinoa.local";
+    HOSTS << "udon.local";
+    HOSTS << "spam.local";
+    HOSTS << "donut.local";
+    HOSTS << "nachos.local";
 
     HOSTS.size() => int nHosts;
 

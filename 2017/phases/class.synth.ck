@@ -59,7 +59,7 @@ public class Synth {
     fun void setOscGain(int osc, int gain) {
         <<< osc, gain >>>;
         if (osc == 0)
-            gain * 1.5 / 127.0 => sin.gain;
+            gain / 127.0 => sin.gain;
         if (osc == 1)
             gain / 127.0 => sqr.gain;
         if (osc == 2)

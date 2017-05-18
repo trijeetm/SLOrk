@@ -35,12 +35,12 @@ fun void initNetwork() {
     string HOSTS[0];
     6449 => int port;
 
-    HOSTS << "chowder.local";
-    HOSTS << "quinoa.local";
-    HOSTS << "udon.local";
-    HOSTS << "spam.local";
-    HOSTS << "donut.local";
-    HOSTS << "nachos.local";
+    HOSTS << "localhost";
+    HOSTS << "localhost";
+    HOSTS << "localhost";
+    HOSTS << "localhost";
+    HOSTS << "localhost";
+    HOSTS << "localhost";
 
     HOSTS.size() => int nHosts;
 

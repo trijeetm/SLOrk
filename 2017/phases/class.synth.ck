@@ -18,6 +18,9 @@ public class Synth {
     dur baseNoteDur;
     0::ms => dur noteDur;
 
+    OscSend gfxXmit;
+    float rlsTime, atkTime;
+
     fun void init(dur _baseNoteDur) {
         _baseNoteDur => baseNoteDur;
 
@@ -37,6 +40,9 @@ public class Synth {
         0 => noise.gain;
 
         env.set(0.001, 0, 1, 0.001);
+
+        gfxXmit.setHost("localhost", 12000);
+        0.5 => rlsTime => atkTime;
     }
 
     fun void setNote(int note) {
@@ -58,14 +64,16 @@ public class Synth {
 
     fun void setOscGain(int osc, int gain) {
         <<< osc, gain >>>;
+        float _gain;
+        Math.pow(gain / 127.0, 2) => _gain;
         if (osc == 0)
-            gain / 127.0 => sin.gain;
+            _gain => sin.gain;
         if (osc == 1)
-            gain / 127.0 => sqr.gain;
+            _gain => sqr.gain;
         if (osc == 2)
-            gain / 127.0 => saw.gain;
+            _gain => saw.gain;
         if (osc == 3)
-            gain / 127.0 => noise.gain;
+            _gain => noise.gain;
     }
 
     fun void setAttack(int atk) {
@@ -88,8 +96,22 @@ public class Synth {
     }
 
     fun void _play() {
+        gfxFadeIn();
         env.keyOn();
         noteDur => now;
+        gfxFadeOut();
         env.keyOff();
+    }
+
+    fun void gfxFadeIn() {
+        "/screen/fadeIn" => string path;
+        gfxXmit.startMsg(path, "f");
+        atkTime => gfxXmit.addFloat;
+    }
+
+    fun void gfxFadeOut() {
+        "/screen/fadeOut" => string path;
+        gfxXmit.startMsg(path, "f");
+        rlsTime => gfxXmit.addFloat;
     }
 }

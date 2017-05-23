@@ -1,0 +1,10 @@
+
+{
+    "udp": {
+        "addr": "bkgoksel-laptop",
+        "port": 6449
+    },
+    "ws": {
+       "port": 8081
+    }
+}

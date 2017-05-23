@@ -46,7 +46,7 @@ fun void initNetwork() {
 
     // aim the transmitter
     for (0 => int i; i < nHosts; i++) {
-        xmit[i].setHost(HOSTS[i], port + i);
+        xmit[i].setHost(HOSTS[i], port);
     }
 
     xmit @=> xmitters;

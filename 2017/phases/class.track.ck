@@ -16,6 +16,7 @@ public class Track {
     Synth synth;
     Sequencer clappingSeq[8];
     0 => int currSeq;
+    dur baseNoteLen;
 
     false => int isPlaying;
     true => int isMute;
@@ -29,6 +30,8 @@ public class Track {
         bpm => originalBpm;
 
         metro.setup(bpm, 12, 8);
+
+        metro.getSixteenthBeatDur() => baseNoteLen;
 
         initPlayer(metro.getSixteenthBeatDur());
         synth.init(metro.getSixteenthBeatDur());
@@ -205,35 +208,51 @@ public class Track {
 
     fun void initPlayer(dur baseNoteLen) {
         baseNoteLen / 1::samp => float lenInFloat;
-        "/player/init/" + id => string path;
-        xmit.startMsg(path, "f");
+        "/player/init" => string path;
+        xmit.startMsg(path, "i f");
+        id => xmit.addInt;
         lenInFloat => xmit.addFloat;
         <<< "init-ing player" >>>;
     }
 
     fun void triggerPlayer(int note, int len) {
-        "/player/trigger/" + id => string path;
+        spork ~ triggerNoteOn(note);
+        spork ~ triggerNoteOff(baseNoteLen * len);
+    }
+
+    fun void triggerNoteOn(int note) {
+        "/player/synth/noteOn" => string path;
         xmit.startMsg(path, "i i");
+        id => xmit.addInt;
         note => xmit.addInt;
-        len => xmit.addInt;
+    }
+
+    fun void triggerNoteOff(dur len) {
+        len => now;
+        "/player/synth/noteOff" => string path;
+        xmit.startMsg(path, "i");
+        id => xmit.addInt;
     }
 
     fun void setSynthGain(int osc, int gain) {
-        "/player/synth/gain/" + id => string path;
-        xmit.startMsg(path, "i i");
+        "/player/synth/gain" => string path;
+        xmit.startMsg(path, "i i i");
+        id => xmit.addInt;
         osc => xmit.addInt;
         gain => xmit.addInt;
     }
 
     fun void setSynthAttack(int atk) {
-        "/player/synth/attack/" + id => string path;
-        xmit.startMsg(path, "i");
+        "/player/synth/attack" => string path;
+        xmit.startMsg(path, "i i");
+        id => xmit.addInt;
         atk => xmit.addInt;
     }
 
     fun void setSynthRelease(int rel) {
-        "/player/synth/release/" + id => string path;
-        xmit.startMsg(path, "i");
+        "/player/synth/release" => string path;
+        xmit.startMsg(path, "i i");
+        id => xmit.addInt;
         rel => xmit.addInt;
     }
 }

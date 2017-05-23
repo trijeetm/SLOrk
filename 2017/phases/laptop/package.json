@@ -22,6 +22,6 @@
         "ws": "1.1.0"
     },
     "scripts": {
-        "start": "node osc-bridge.js & open index.html;"
+        "start": "open index.html & node osc-bridge.js;"
     }
 }

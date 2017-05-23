@@ -4,6 +4,10 @@ var env;
 var meter;
 
 var config = {
+    ws: {
+        ip: "192.168.0.107",
+        port: "8081"
+    },
     envParams: {
         attackTime: 0.005,
         decayTime: 0.0,
@@ -20,7 +24,8 @@ var config = {
             width: 20,
             alpha: 0.2
         }
-    }
+    },
+    noteOffset: 24
 }
 
 var oscPlug = {
@@ -69,7 +74,7 @@ function draw() {
 
 function handleOSC() {
     var port = new osc.WebSocketPort({
-        url: "ws://localhost:8081"
+        url: "ws://" + config.ws.ip + ":" + config.ws.port
     });
 
     port.on("message", function (oscMessage) {
@@ -105,7 +110,7 @@ function tuneSynths(note) {
 
 function noteOn(note) {
     console.log("Playing " + note);
-    tuneSynths(note);
+    tuneSynths(note + config.noteOffset);
     env.triggerAttack();
 }
 

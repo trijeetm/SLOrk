@@ -9,7 +9,7 @@ spork ~ handleMIDI();
 main();
 
 fun void main() {
-    tracks[0].init(0, xmitters[0], 200);
+    tracks[0].init(0, xmitters[0], 100);
     tracks[0].play();
 
     /*

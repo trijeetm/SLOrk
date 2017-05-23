@@ -71,13 +71,6 @@ public class Track {
         // clapping seq full
         [[36, 1], [36, 1], [36, 1], [0, 1], [60, 1], [60, 1], [0, 1], [60, 1], [0, 1], [48, 1], [48, 1], [0, 1]] @=> measure;
         clappingSeq[7].addMeasure(measure);
-
-        /*
-            workaround to play full clapping seq by default without midi controller
-        */
-        unmute();
-        selectClappingSeq(7);
-
     }
 
     fun void play() {
@@ -101,6 +94,7 @@ public class Track {
             metro.eighthNoteTick => now;
 
             if (clappingSeq[currSeq].hasNote() && !isMute) {
+                <<< "." >>>;
                 triggerPlayer(clappingSeq[currSeq].getNote(), clappingSeq[currSeq].getLength());
             }
 

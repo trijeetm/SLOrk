@@ -13,6 +13,12 @@ fun void main() {
     tracks[0].play();
 
     /*
+        workaround to play full clapping seq by default without midi controller
+    */
+    tracks[0].unmute();
+    tracks[0].selectClappingSeq(7);
+
+    /*
     tracks[1].init(1, xmitters[1], 200);
     tracks[1].play();
 

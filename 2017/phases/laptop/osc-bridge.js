@@ -2,8 +2,11 @@
 //  Bi-Directional OSC messaging Websocket <-> UDP
 //--------------------------------------------------
 
+
 var osc = require("osc"),
-    WebSocket = require("ws");
+    WebSocket = require("ws"),
+    dns = require("dns"),
+    config = require("./slork_bridge_config");
 
 var getIPAddresses = function () {
     var os = require("os"),
@@ -25,38 +28,46 @@ var getIPAddresses = function () {
     return ipAddresses;
 };
 
-var udp = new osc.UDPPort({
-    // address to listen to
-    localAddress: "127.0.0.1",
-    localPort: 6449,
-    // address to write back to
-    remoteAddress: "127.0.0.1",
-    remotePort: 7500
-});
-
-udp.on("ready", function () {
-    var ipAddresses = getIPAddresses();
-    console.log("Listening for OSC over UDP.");
-    console.log(" Host: ", udp.options.localAddress);
-    ipAddresses.forEach(function (address) {
-        console.log(" Host:", address + ", Port:", udp.options.localPort);
+var setupWithHost = function(addr) {
+    var udp = new osc.UDPPort({
+      localAddress: config.udp.addr,
+      port: config.udp.port,
+      remoteAddress: config.udp.addr,
+      remotePort: config.udp.port
     });
-    console.log("Broadcasting OSC over UDP to", udp.options.remoteAddress + ", Port:", udp.options.remotePort);
-});
-
-udp.open();
-
-var wss = new WebSocket.Server({
-    port: 8081
-});
-
-wss.on("connection", function (socket) {
-    console.log("A Web Socket connection has been established!");
-    var socketPort = new osc.WebSocketPort({
-        socket: socket
+    udp.on("ready", function () {
+        var ipAddresses = getIPAddresses();
+        console.log("Listening for OSC over UDP.");
+        console.log(" Host: ", udp.options.localAddress);
+        ipAddresses.forEach(function (address) {
+            console.log(" Host:", address + ", Port:", udp.options.localPort);
+        });
+        console.log("Broadcasting OSC over UDP to", udp.options.remoteAddress + ", Port:", udp.options.remotePort);
     });
 
-    var relay = new osc.Relay(udp, socketPort, {
-        raw: true
+    udp.open();
+
+    var wss = new WebSocket.Server({
+        port: config.ws.port
     });
+
+    wss.on("connection", function (socket) {
+        console.log("A Web Socket connection has been established!");
+        var socketPort = new osc.WebSocketPort({
+            socket: socket
+        });
+
+        var relay = new osc.Relay(udp, socketPort, {
+            raw: true
+        });
+    });
+}
+
+dns.lookup(config.udp.addr, (err, addr, fam) => {
+  if (err) {
+    console.log(err);
+  } else {
+    setupWithHost(addr);
+  }
 });
+

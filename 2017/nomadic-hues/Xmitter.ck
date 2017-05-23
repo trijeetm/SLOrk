@@ -26,18 +26,18 @@ public class Xmitter
       //NUM_BASS basses (handled as special case by the sendBass function)
       [0] @=> bassIndexes;
       backing[0].setHost ( "localhost", port );
-    } else 
+    } else
     {
       <<< "Initializing Xmitter for non-local" >>>;
 
-      12 => num_targets;
+      3 => num_targets;
       [0, 4, 6, 8, 10] @=> bassIndexes;
 
       // front
-      backing[0].setHost ( "spam.local", port );
-      backing[1].setHost ( "pho.local", port );
+      backing[0].setHost ( "donut.local", port );
+      backing[1].setHost ( "empanada.local", port );
       backing[2].setHost ( "chowder.local", port );
-      backing[3].setHost ( "vindaloo.local", port );
+      /*backing[3].setHost ( "vindaloo.local", port );
       backing[4].setHost ( "jambalaya.local", port );
       // back
       backing[5].setHost ( "lasagna.local", port );
@@ -46,7 +46,7 @@ public class Xmitter
       backing[8].setHost ( "meatloaf.local", port );
       backing[9].setHost ( "hamburger.local", port );
       backing[10].setHost ( "albacore.local", port );
-      backing[11].setHost ( "kimchi.local", port);
+      backing[11].setHost ( "kimchi.local", port);*/
     }
   }
 

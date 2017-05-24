@@ -1,7 +1,7 @@
 
 {
     "udp": {
-        "addr": "bkgoksel-laptop",
+        "addr": "localhost",
         "port": 6449
     },
     "ws": {

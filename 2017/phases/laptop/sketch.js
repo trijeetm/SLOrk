@@ -88,7 +88,7 @@ function setupAudio() {
 }
 
 function tuneSynths(note) {
-    config.visualParams.H = note % 100;
+    config.visual.bg.H = note % 100;
     sinOsc.freq(midiToFreq(note));
 }
 

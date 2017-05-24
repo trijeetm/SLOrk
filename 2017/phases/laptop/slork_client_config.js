@@ -1,6 +1,6 @@
 var config = {
     ws: {
-        ip: "127.0.0.1",
+        ip: "localhost",
         port: "8081"
     },
     frameRate: 60,

@@ -30,22 +30,27 @@ var getIPAddresses = function () {
 
 var setupWithHost = function(addr) {
     var udp = new osc.UDPPort({
-      localAddress: config.udp.addr,
-      port: config.udp.port,
-      remoteAddress: config.udp.addr,
+      localAddress: addr,
+      localPort: config.udp.port,
+      remoteAddress: addr,
       remotePort: config.udp.port
     });
+
     udp.on("ready", function () {
         var ipAddresses = getIPAddresses();
         console.log("Listening for OSC over UDP.");
-        console.log(" Host: ", udp.options.localAddress);
-        ipAddresses.forEach(function (address) {
-            console.log(" Host:", address + ", Port:", udp.options.localPort);
-        });
+        console.log(" Host: ", udp.options.localAddress, "Port: ", udp.options.localPort);
+        // ipAddresses.forEach(function (address) {
+        //     console.log(" Host:", address + ", Port:", udp.options.localPort);
+        // });
         console.log("Broadcasting OSC over UDP to", udp.options.remoteAddress + ", Port:", udp.options.remotePort);
     });
 
     udp.open();
+
+    udp.on("message", function (msg) {
+        console.log(msg);
+    })
 
     var wss = new WebSocket.Server({
         port: config.ws.port
@@ -65,9 +70,10 @@ var setupWithHost = function(addr) {
 
 dns.lookup(config.udp.addr, (err, addr, fam) => {
   if (err) {
-    console.log(err);
+      console.log(err);
   } else {
-    setupWithHost(addr);
+      console.log(addr);
+      setupWithHost(addr);
   }
 });
 

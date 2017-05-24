@@ -22,6 +22,7 @@
         "ws": "1.1.0"
     },
     "scripts": {
-        "start": "open index.html & node osc-bridge.js;"
+        "laptop": "open slorktop.html & chuck relay.ck & node osc-bridge.js;",
+        "phone": "open index.html & node osc-bridge.js;"
     }
 }

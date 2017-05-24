@@ -2,7 +2,7 @@
 {
     "udp": {
         "addr": "localhost",
-        "port": 6449
+        "port": 12000
     },
     "ws": {
        "port": 8081

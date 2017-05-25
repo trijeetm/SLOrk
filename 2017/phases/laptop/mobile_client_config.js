@@ -1,4 +1,5 @@
 var config = {
+	promptId: false,
     ws: {
         ip: "192.168.0.109",
         port: "8081"

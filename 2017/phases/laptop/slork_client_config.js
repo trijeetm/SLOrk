@@ -1,4 +1,5 @@
 var config = {
+	promptId: true,
     ws: {
         ip: "localhost",
         port: "8081"

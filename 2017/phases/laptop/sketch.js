@@ -15,7 +15,11 @@ var oscPlug = {
 }
 
 function getId() {
-	clientId = prompt("ID", "0");
+	if (config.promptId) {
+	    clientId = prompt("ID", "0");
+	} else {
+		clientId = -1;
+	}
 }
 
 function setup() {

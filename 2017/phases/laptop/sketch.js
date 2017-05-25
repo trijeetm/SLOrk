@@ -89,7 +89,7 @@ function drawWave() {
 }
 
 function draw() {
-    background(50);
+    background(0);
     drawBG();
     drawWave();
 }

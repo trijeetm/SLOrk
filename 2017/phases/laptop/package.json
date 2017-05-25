@@ -25,6 +25,6 @@
         "laptop": "open slorktop.html & chuck relay.ck & node osc-bridge.js;",
         "relay": "chuck relay.ck & node osc-bridge.js;",
         "phone": "open index.html & node osc-bridge.js;",
-        "fileserver": "http-server ./"
+        "fileserver": "http-server -g -c-1 ./"
     }
 }

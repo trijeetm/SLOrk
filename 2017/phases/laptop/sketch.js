@@ -8,8 +8,7 @@ var devices = {
 }
 
 var state = {
-  clientId: config.default_id,
-  wavePos: 0
+  rotation: 0
 }
 
 
@@ -43,7 +42,7 @@ function deviceMoved() {
   } else if (rotationX < -90) {
     rot = -90;
   }
-  state.wavePos = rot/90.0;
+  state.rotation = rot/180.0 + 0.5;
 }
 
 function drawBG() {
@@ -65,9 +64,12 @@ function drawWave() {
     strokeWeight(config.visual.stroke.width);
     stroke(0, 0, 0, config.visual.stroke.alpha);
     fill(0, 0, 0, 0);
+    var bottomOffset = state.rotation * (height - config.waveHeight)
+    var waveTop = bottom_offset + config.waveHeight;
+    var waveBot = bottom_offset;
     for (var i = 0; i < waveform.length; i++){
         var x = map(i, 0, waveform.length, 0, width);
-        var y = map(waveform[i], -1 * config.visual.stroke.scale, config.visual.stroke.scale, height, 0);
+        var y = map(waveform[i], -1, 1, waveTop, waveBottom);
         vertex(x, y);
     }
     endShape();
@@ -86,13 +88,8 @@ function handleOSC() {
 
     port.on("message", function (oscMessage) {
         console.log("message", oscMessage);
-        if (oscMessage.address === "/player/init") {
-          clientId = oscMessage.args[0];
-        }
         var id = oscMessage.args[0];
-        if (id == clientId) {
-          oscPlug[oscMessage.address](oscMessage.args);
-        }
+        oscPlug[oscMessage.address](oscMessage.args);
     });
 
     port.open();

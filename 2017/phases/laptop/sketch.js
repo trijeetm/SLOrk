@@ -18,7 +18,7 @@ function getId() {
 	if (config.promptId) {
 	    clientId = prompt("ID", "0");
 	} else {
-		clientId = -1;
+		clientId = 0;
 	}
 }
 
@@ -65,7 +65,7 @@ function handleOSC() {
     var port = new osc.WebSocketPort({
         url: "ws://" + config.ws.ip + ":" + config.ws.port
     });
-	
+
     port.on("message", function (oscMessage) {
         console.log("message", oscMessage);
         var id = oscMessage.args[0];

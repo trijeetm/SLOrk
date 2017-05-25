@@ -14,13 +14,20 @@ public class Track {
 
     Metronome metro;
     Synth synth;
-    Sequencer clappingSeq[8];
-    0 => int currSeq;
     dur baseNoteLen;
+
+    Sequencer clappingSeq[8];
+    0 => int currClappingSeq;
+
+    Sequencer wavingSeq[1];
+    0 => int currWavingSeq;
 
     false => int isPlaying;
     true => int isMute;
     false => int isPhasing;
+
+    false => int isClappingSeq;
+    false => int isWavingSeq;
 
     0 => int offset;
 
@@ -71,6 +78,11 @@ public class Track {
         // clapping seq full
         [[36, 1], [36, 1], [36, 1], [0, 1], [60, 1], [60, 1], [0, 1], [60, 1], [0, 1], [48, 1], [48, 1], [0, 1]] @=> measure;
         clappingSeq[7].addMeasure(measure);
+
+
+        // waving seq 1
+        [[48, 1], [50, 1], [52, 1], [54, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]] @=> measure;
+        wavingSeq[0].addMeasure(measure);
     }
 
     fun void play() {
@@ -93,12 +105,20 @@ public class Track {
         while (isPlaying) {
             metro.eighthNoteTick => now;
 
-            if (clappingSeq[currSeq].hasNote() && !isMute) {
+            if (clappingSeq[currClappingSeq].hasNote() && !isMute && isClappingSeq) {
                 <<< "." >>>;
-                triggerPlayer(clappingSeq[currSeq].getNote(), clappingSeq[currSeq].getLength());
+                triggerPlayer(clappingSeq[currClappingSeq].getNote(), clappingSeq[currClappingSeq].getLength());
             }
 
-            clappingSeq[currSeq].tick();
+            if (wavingSeq[currWavingSeq].hasNote() && !isMute && isWavingSeq) {
+                if (wavingSeq[currWavingSeq].playhead == id) {
+                    <<< "." >>>;
+                    triggerPlayer(wavingSeq[currWavingSeq].getNote(), wavingSeq[currWavingSeq].getLength());
+                }
+            }
+
+            clappingSeq[currClappingSeq].tick();
+            wavingSeq[currWavingSeq].tick();
         }
     }
 
@@ -108,7 +128,10 @@ public class Track {
             metro.measureTick => now;
             1::samp => now;
             <<< metro.getMeasure() >>>;
-            <<< "[", !isMute, "]", " track:", id, "offset:", clappingSeq[currSeq].getOffset(), "seq:", currSeq, "(", isPhasing, ")" >>>;
+            if (isClappingSeq)
+                <<< "[", !isMute, "]", " track:", id, "offset:", clappingSeq[currClappingSeq].getOffset(), "seq:", currClappingSeq, "(", isPhasing, ")" >>>;
+            if (isWavingSeq)
+                <<< "[", !isMute, "]", " track:", id, "offset:", wavingSeq[currWavingSeq].getOffset(), "seq:", currWavingSeq, "(", isPhasing, ")" >>>;
         }
     }
 
@@ -118,7 +141,10 @@ public class Track {
 
     fun void _incOffset() {
         metro.measureTick => now;
-        clappingSeq[currSeq].incOffset();
+        if (isClappingSeq)
+            clappingSeq[currClappingSeq].incOffset();
+        if (isWavingSeq)
+            wavingSeq[currWavingSeq].incOffset();
     }
 
     fun void decOffset() {
@@ -127,7 +153,10 @@ public class Track {
 
     fun void _decOffset() {
         metro.measureTick => now;
-        clappingSeq[currSeq].decOffset();
+        if (isClappingSeq)
+            clappingSeq[currClappingSeq].decOffset();
+        if (isWavingSeq)
+            wavingSeq[currWavingSeq].decOffset();
     }
 
     fun void mute() {
@@ -150,7 +179,16 @@ public class Track {
 
     fun void selectClappingSeq(int s) {
         metro.measureTick => now;
-        s => currSeq;
+        s => currClappingSeq;
+        true => isClappingSeq;
+        false => isWavingSeq;
+    }
+
+    fun void selectWavingSeq(int s) {
+        metro.measureTick => now;
+        s => currWavingSeq;
+        true => isWavingSeq;
+        false => isClappingSeq;
     }
 
     fun void phase(int phaseLvl) {

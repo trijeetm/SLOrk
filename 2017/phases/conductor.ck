@@ -9,28 +9,31 @@ spork ~ handleMIDI();
 main();
 
 fun void main() {
+    /*
+    workaround to play full clapping seq by default without midi controller
+    */
     tracks[0].init(0, xmitters[0], 200);
     tracks[0].play();
-
-    /*
-        workaround to play full clapping seq by default without midi controller
-*/
 	tracks[0].unmute();
-	tracks[0].selectClappingSeq(5);
+	tracks[0].selectWavingSeq(0);
 
     tracks[1].init(1, xmitters[1], 200);
     tracks[1].play();
-
 	tracks[1].unmute();
-	tracks[1].selectClappingSeq(6);
+	tracks[1].selectWavingSeq(0);
 
-    /*
     tracks[2].init(2, xmitters[2], 200);
     tracks[2].play();
+    tracks[2].unmute();
+	tracks[2].selectWavingSeq(0);
+
 
     tracks[3].init(3, xmitters[3], 200);
     tracks[3].play();
+    tracks[3].unmute();
+	tracks[3].selectWavingSeq(0);
 
+    /*
     tracks[4].init(4, xmitters[4], 200);
     tracks[4].play();
 
@@ -46,6 +49,8 @@ fun void initNetwork() {
     string HOSTS[0];
     6449 => int port;
 
+    HOSTS << "localhost";
+    HOSTS << "localhost";
     HOSTS << "localhost";
     HOSTS << "localhost";
 

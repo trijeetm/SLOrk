@@ -25,19 +25,18 @@ function getId() {
 	if (config.promptId) {
 	    clientId = prompt("ID", "0");
 	} else {
-		clientId = 0;
+	    clientId = "0";
 	}
 }
 
 function setup() {
     frameRate(config.frameRate);
-
-	getId();
+    getId();
     handleOSC();
     setupAudio();
     setupVisuals();
 
-    fullscreen(true);
+    //fullscreen(true);
 
     colorMode(HSB, 100, 100, 100, 1);
     createCanvas(windowWidth, windowHeight);
@@ -46,12 +45,12 @@ function setup() {
 function deviceMoved() {
   if (config.visual.moveWave) {
     var rot = rotationX;
-    if (rotationX > 90) {
-      rot = 90;
-    } else if (rotationX < -90) {
-      rot = -90;
+    if (rotationX > 40) {
+      rot = 40;
+    } else if (rotationX < -10) {
+      rot = -10;
     }
-    state.rotation = rot/180.0 + 0.5;
+    state.rotation = (rot + 10)/50.0;
   }
 }
 
@@ -90,7 +89,7 @@ function drawWave() {
 }
 
 function draw() {
-    background(0);
+    background(50);
     drawBG();
     drawWave();
 }
@@ -98,6 +97,9 @@ function draw() {
 function handleOSC() {
     var port = new osc.WebSocketPort({
         url: "ws://" + config.ws.ip + ":" + config.ws.port
+    });
+    port.on("connection", function () {
+	console.log("connected");
     });
 
     port.on("message", function (oscMessage) {

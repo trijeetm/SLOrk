@@ -1,8 +1,16 @@
-var sinOsc;
-var fft;
-var env;
-var meter;
 var clientId;
+var devices = {
+  osc: {
+    sin: null
+  },
+  env: null,
+  meter: null,
+  fft: null
+}
+
+var state = {
+  rotation: 0
+}
 
 var oscPlug = {
     "/player/synth/noteOn": function (args) {
@@ -30,14 +38,24 @@ function setup() {
     setupAudio();
     setupVisuals();
 
+    fullscreen(true);
+
     colorMode(HSB, 100, 100, 100, 1);
     createCanvas(windowWidth, windowHeight);
 }
 
-function draw() {
-    var level = meter.getLevel();
-    background(0);
+function deviceMoved() {
+  var rot = rotationX;
+  if (rotationX > 90) {
+    rot = 90;
+  } else if (rotationX < -90) {
+    rot = -90;
+  }
+  state.rotation = rot/180.0 + 0.5;
+}
 
+function drawBG() {
+    var level = devices.meter.getLevel();
     var bgColor = color(
         config.visual.bg.H,
         config.visual.bg.S,
@@ -47,25 +65,36 @@ function draw() {
     noStroke();
     fill(bgColor);
     rect(0, 0, width, height);
+}
 
-    var waveform = fft.waveform();  // analyze the waveform
+function drawWave() {
+    var waveform = devices.fft.waveform();  // analyze the waveform
     beginShape();
     strokeWeight(config.visual.stroke.width);
     stroke(0, 0, 0, config.visual.stroke.alpha);
     fill(0, 0, 0, 0);
+    var bottomOffset = state.rotation * (height - config.waveHeight)
+    var waveTop = bottom_offset + config.waveHeight;
+    var waveBot = bottom_offset;
     for (var i = 0; i < waveform.length; i++){
         var x = map(i, 0, waveform.length, 0, width);
-        var y = map(waveform[i], -1 * config.visual.stroke.scale, config.visual.stroke.scale, height, 0);
+        var y = map(waveform[i], -1, 1, waveTop, waveBottom);
         vertex(x, y);
     }
     endShape();
+}
+
+function draw() {
+    background(0);
+    drawBG();
+    drawWave();
 }
 
 function handleOSC() {
     var port = new osc.WebSocketPort({
         url: "ws://" + config.ws.ip + ":" + config.ws.port
     });
-	
+
     port.on("message", function (oscMessage) {
         console.log("message", oscMessage);
         var id = oscMessage.args[0];
@@ -78,37 +107,37 @@ function handleOSC() {
 }
 
 function setupVisuals() {
-    fft = new p5.FFT();
+    devices.fft = new p5.FFT();
 }
 
 function setupAudio() {
-    sinOsc = new p5.SinOsc();
-    meter = new p5.Amplitude(0.10);
+    devices.osc.sin = new p5.SinOsc();
+    devices.meter = new p5.Amplitude(0.10);
 
-    env = new p5.Env();
-    env.setADSR(
+    devices.env = new p5.Env();
+    devices.env.setADSR(
         config.audio.env.attackTime,
         config.audio.env.decayTime,
         config.audio.env.susPercent,
         config.audio.env.releaseTime);
 
-    env.setRange(1, 0);
+    devices.env.setRange(1, 0);
 
-    sinOsc.amp(env);
-    sinOsc.start();
+    devices.osc.sin.amp(devices.env);
+    devices.osc.sin.start();
 }
 
 function tuneSynths(note) {
     config.visual.bg.H = note % 100;
-    sinOsc.freq(midiToFreq(note));
+    devices.osc.sin.freq(midiToFreq(note));
 }
 
 function noteOn(note) {
     console.log("Playing " + note);
     tuneSynths(note + config.audio.noteOffset);
-    env.triggerAttack();
+    devices.env.triggerAttack();
 }
 
 function noteOff() {
-    env.triggerRelease();
+    devices.env.triggerRelease();
 }

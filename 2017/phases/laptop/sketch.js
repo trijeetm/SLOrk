@@ -45,13 +45,15 @@ function setup() {
 }
 
 function deviceMoved() {
-  var rot = rotationX;
-  if (rotationX > 90) {
-    rot = 90;
-  } else if (rotationX < -90) {
-    rot = -90;
+  if (config.visual.moveWave) {
+    var rot = rotationX;
+    if (rotationX > 90) {
+      rot = 90;
+    } else if (rotationX < -90) {
+      rot = -90;
+    }
+    state.rotation = rot/180.0 + 0.5;
   }
-  state.rotation = rot/180.0 + 0.5;
 }
 
 function drawBG() {
@@ -73,9 +75,13 @@ function drawWave() {
     strokeWeight(config.visual.stroke.width);
     stroke(0, 0, 0, config.visual.stroke.alpha);
     fill(0, 0, 0, 0);
-    var bottomOffset = state.rotation * (height - config.waveHeight)
-    var waveTop = bottom_offset + config.waveHeight;
-    var waveBot = bottom_offset;
+    var waveTop = height;
+    var waveBot = 0;
+    if (config.visual.moveWave) {
+      var bottomOffset = state.rotation * (height - config.waveHeight)
+      waveTop = bottom_offset + config.visual.waveHeight;
+      waveBot = bottom_offset;
+    }
     for (var i = 0; i < waveform.length; i++){
         var x = map(i, 0, waveform.length, 0, width);
         var y = map(waveform[i], -1, 1, waveTop, waveBottom);

@@ -14,7 +14,6 @@ var state = {
 
 var oscPlug = {
     "/player/synth/noteOn": function (args) {
-        console.log(args[1]);
         noteOn(args[1]);
     },
     "/player/synth/noteOff": function (args) {
@@ -26,7 +25,7 @@ function getId() {
 	if (config.promptId) {
 	    clientId = prompt("ID", "0");
 	} else {
-		clientId = -1;
+		clientId = 0;
 	}
 }
 
@@ -78,7 +77,9 @@ function drawWave() {
     var waveTop = height;
     var waveBot = 0;
     if (config.visual.moveWave) {
-      var bottomOffset = state.rotation * (height - config.waveHeight)
+      var bottom_offset = state.rotation * (height - config.visual.waveHeight)
+      console.log("rotation", state.rotation, " height", height, " waveH", config.visual.waveHeight);
+      console.log("bottom_offset", bottom_offset);
       waveTop = bottom_offset + config.visual.waveHeight;
       waveBot = bottom_offset;
     }
@@ -102,7 +103,6 @@ function handleOSC() {
     });
 
     port.on("message", function (oscMessage) {
-        console.log("message", oscMessage);
         var id = oscMessage.args[0];
 		if (id == clientId) {
 			oscPlug[oscMessage.address](oscMessage.args);
@@ -139,7 +139,6 @@ function tuneSynths(note) {
 }
 
 function noteOn(note) {
-    console.log("Playing " + note);
     tuneSynths(note + config.audio.noteOffset);
     devices.env.triggerAttack();
 }

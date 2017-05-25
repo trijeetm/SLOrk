@@ -1,9 +1,13 @@
 var clientId;
 var devices = {
   osc: {
-    sin: null
+    sin: null,
+    saw: null,
   },
-  env: null,
+  env: {
+      sin: null,
+      saw: null
+  },
   meter: null,
   fft: null
 }
@@ -51,6 +55,8 @@ function deviceMoved() {
       rot = -10;
     }
     state.rotation = (rot + 10)/50.0;
+    devices.env.sin.setRange(state.rotation, 0);
+    devices.env.saw.setRange(1-state.rotation, 0);
   }
 }
 
@@ -116,33 +122,48 @@ function setupVisuals() {
     devices.fft = new p5.FFT();
 }
 
-function setupAudio() {
-    devices.osc.sin = new p5.SinOsc();
-    devices.meter = new p5.Amplitude(0.10);
-
-    devices.env = new p5.Env();
-    devices.env.setADSR(
+function getEnv() {}
+    var env = new p5.Env();
+    env.setADSR(
         config.audio.env.attackTime,
         config.audio.env.decayTime,
         config.audio.env.susPercent,
         config.audio.env.releaseTime);
 
-    devices.env.setRange(1, 0);
+    env.setRange(1, 0);
+    return env;
+}
 
+function setupAudio() {
+    devices.meter = new p5.Amplitude(0.10);
+
+    devices.osc.sin = new p5.SinOsc();
+    devices.env.sin = getEnv();
     devices.osc.sin.amp(devices.env);
     devices.osc.sin.start();
+
+    devices.osc.saw = new p5.SawOsc();
+    devices.env.saw = getEnv();
+    devices.osc.saw.amp(devices.env.saw);
+    devices.osc.saw.start();
 }
 
 function tuneSynths(note) {
     config.visual.bg.H = note % 100;
-    devices.osc.sin.freq(midiToFreq(note));
+    devices.osc.forEach(function(osc) {
+        osc.freq(midiToFreq(note))
+    });
 }
 
 function noteOn(note) {
     tuneSynths(note + config.audio.noteOffset);
-    devices.env.triggerAttack();
+    devices.env.forEach(function(env) {
+        env.triggerAttack();
+    });
 }
 
 function noteOff() {
-    devices.env.triggerRelease();
+    devices.env.forEach(function(env) {
+        env.triggerRelease();
+    });
 }

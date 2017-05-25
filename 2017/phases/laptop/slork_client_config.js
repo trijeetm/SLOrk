@@ -1,7 +1,7 @@
 var config = {
     promptId: true,
     ws: {
-        ip: "localhost",
+        ip: "Trijeet.local",
         port: "8081"
     },
     frameRate: 60,

@@ -78,11 +78,12 @@ function drawWave() {
     var waveBot = 0;
     if (config.visual.moveWave) {
       var bottom_offset = state.rotation * (height - config.visual.waveHeight)
-      console.log("rotation", state.rotation, " height", height, " waveH", config.visual.waveHeight);
-      console.log("bottom_offset", bottom_offset);
       waveTop = bottom_offset + config.visual.waveHeight;
       waveBot = bottom_offset;
     }
+    console.log(waveTop);
+    console.log(waveBot);
+    console.log("---------");
     for (var i = 0; i < waveform.length; i++){
         var x = map(i, 0, waveform.length, 0, width);
         var y = map(waveform[i], -1, 1, waveTop, waveBot);

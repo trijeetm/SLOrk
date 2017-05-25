@@ -81,9 +81,6 @@ function drawWave() {
       waveTop = bottom_offset + config.visual.waveHeight;
       waveBot = bottom_offset;
     }
-    console.log(waveTop);
-    console.log(waveBot);
-    console.log("---------");
     for (var i = 0; i < waveform.length; i++){
         var x = map(i, 0, waveform.length, 0, width);
         var y = map(waveform[i], -1, 1, waveTop, waveBot);

@@ -2,6 +2,7 @@ var sinOsc;
 var fft;
 var env;
 var meter;
+var clientId;
 
 var oscPlug = {
     "/player/synth/noteOn": function (args) {
@@ -13,9 +14,14 @@ var oscPlug = {
     }
 }
 
+function getId() {
+	clientId = prompt("ID", "0");
+}
+
 function setup() {
     frameRate(config.frameRate);
 
+	getId();
     handleOSC();
     setupAudio();
     setupVisuals();
@@ -55,12 +61,13 @@ function handleOSC() {
     var port = new osc.WebSocketPort({
         url: "ws://" + config.ws.ip + ":" + config.ws.port
     });
-
+	
     port.on("message", function (oscMessage) {
         console.log("message", oscMessage);
         var id = oscMessage.args[0];
-        console.log("message id " + id);
-        oscPlug[oscMessage.address](oscMessage.args);
+		if (id == clientId) {
+			oscPlug[oscMessage.address](oscMessage.args);
+		}
     });
 
     port.open();

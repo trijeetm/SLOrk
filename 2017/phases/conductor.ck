@@ -14,14 +14,17 @@ fun void main() {
 
     /*
         workaround to play full clapping seq by default without midi controller
-        tracks[0].unmute();
-        tracks[0].selectClappingSeq(7);
-    */
+*/
+	tracks[0].unmute();
+	tracks[0].selectClappingSeq(5);
 
-    /*
     tracks[1].init(1, xmitters[1], 200);
     tracks[1].play();
 
+	tracks[1].unmute();
+	tracks[1].selectClappingSeq(6);
+
+    /*
     tracks[2].init(2, xmitters[2], 200);
     tracks[2].play();
 
@@ -43,6 +46,7 @@ fun void initNetwork() {
     string HOSTS[0];
     6449 => int port;
 
+    HOSTS << "localhost";
     HOSTS << "localhost";
 
     HOSTS.size() => int nHosts;

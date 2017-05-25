@@ -1,5 +1,5 @@
 var config = {
-	promptId: false,
+    promptId: false,
     ws: {
         ip: "Trijeet.local",
         port: "8081"
@@ -25,6 +25,8 @@ var config = {
             width: 20,
             alpha: 0.2,
             scale: 10
-        }
+        },
+        moveWave: true,
+        waveHeight: 200
     },
 }

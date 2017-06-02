@@ -11,9 +11,9 @@ OscP5 oscP5;
 Colors colors = new Colors();
 
 // update variables as per world
-int N_PLAYERS = 12;
-int WIDTH = 12;
-int HEIGHT = 12;
+int N_PLAYERS = 11;
+int WIDTH = 11;
+int HEIGHT = 11;
 
 float WORLD_SIZE = 960;
 float CELL_SIZE = WORLD_SIZE / WIDTH;
@@ -36,14 +36,14 @@ void setup() {
   frameRate(60);
 
   Ani.init(this);
-  
+
   oscP5 = new OscP5(this, 4242);
 
   initWorld();
-  
+
   /* osc plug service
    * osc messages with a specific address pattern can be automatically
-   * forwarded to a specific method of an object. in this example 
+   * forwarded to a specific method of an object. in this example
    * a message with address pattern /test will be forwarded to a method
    * test(). below the method test takes 2 arguments - 2 ints. therefore each
    * message with address pattern /test and typetag ii will be forwarded to
@@ -157,10 +157,10 @@ void cellFadeOut(int id, int x, int y, int time) {
 /* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage oscMsg) {
   /* with theOscMessage.isPlugged() you check if the osc message has already been
-   * forwarded to a plugged method. if theOscMessage.isPlugged()==true, it has already 
-   * been forwared to another method in your sketch. theOscMessage.isPlugged() can 
+   * forwarded to a plugged method. if theOscMessage.isPlugged()==true, it has already
+   * been forwared to another method in your sketch. theOscMessage.isPlugged() can
    * be used for double posting but is not required.
-  */  
+  */
   if (oscMsg.isPlugged() == false) {
     /* print the address pattern and the typetag of the received OscMessage */
     println("### received an osc message.");

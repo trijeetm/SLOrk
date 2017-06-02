@@ -1,7 +1,7 @@
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
 
-VAR=$1 
+VAR=$1
 
 function ctrl_c() {
         chuck killall-clients.ck:$VAR

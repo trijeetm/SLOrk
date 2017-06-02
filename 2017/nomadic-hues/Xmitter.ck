@@ -11,7 +11,7 @@ public class Xmitter
   int bassIndexes[NUM_BASS];
 
   5 => int NUM_IN_FRONT;
-  7 => int NUM_IN_BACK;
+  6 => int NUM_IN_BACK;
 
   fun void init(string arg)
   {

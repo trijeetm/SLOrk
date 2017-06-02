@@ -3,8 +3,8 @@
 200::ms => dur T;
 
 // dimensions
-12 => int height;
-12 => int width;
+11 => int height;
+11 => int width;
 
 //if nonzero, server has indicated it is safe to begin.
 0 => int pieceIsActive;
@@ -273,6 +273,7 @@ fun void gridinit(int which) {
       y*width + x => int idx;
       if (y > height / 2)
       {
+        // here, 12 represents one octave, not the number of players - NT 2017
         scale[x] + (height - y) * 12 => grid[idx].pitch;
       }
       else

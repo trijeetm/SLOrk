@@ -1,3 +1,13 @@
+// ASNI COLORS
+"\033[0m" => string RESET;
+"\033[1;32m" => string GREEN;
+"\033[0;36m" => string CYAN;
+"\033[1;31m" => string RED;
+"\033[1;33m" => string YELLOW;
+
+
+//init keyboard
+<<< GREEN,"running nameless-server.ck",RESET >>>;
 
 // value of clock
 200::ms => dur T;
@@ -117,7 +127,7 @@ MidiMsg msg;
 if( !min.open( device ) ) me.exit();
 
 // print out device that was opened
-<<< "MIDI device:", min.num(), " -> ", min.name() >>>;
+<<< YELLOW, "MIDI device:", min.num(), " -> ", min.name(), RESET >>>;
 
 
 /***************************************************************** HEARTBEATS */
@@ -140,7 +150,7 @@ fun void waitForHeartbeats()
     {
       if (isAlive[i] < 5)
       {
-        <<< "Client with id", i, "is not responding." >>>;
+        <<< RED, "Client with id", i, "is not responding.", RESET >>>;
         false => allAlive;
       }
     }
@@ -157,7 +167,7 @@ fun void waitForHeartbeats()
     }
   }
 
-  <<< "All clients up..." >>>;
+  <<< GREEN, "All clients up...", RESET >>>;
   1 => pieceIsActive;
 }
 
@@ -790,18 +800,21 @@ fun void keyboard()
         //r
         if (msg.which == 21)
         {
+          <<< RED, "RED", RESET >>>;
           spork ~slewColors(HSV.getWarm());
         }
 
         //g
         if (msg.which == 10)
         {
+          <<< GREEN, "GREEN", RESET >>>;
           spork ~slewColors(HSV.getGreen());
         }
 
         //b
         if (msg.which == 5)
         {
+          <<< CYAN, "BLUE", RESET >>>;
           spork ~slewColors(HSV.getCool());
         }
 
@@ -871,6 +884,17 @@ fun void keyboard()
         if (msg.which == 81)
         {
           spork ~mutateSaturation(-1);
+        }
+
+        // escape force hide all players.
+        if (msg.which == 41)
+        {
+          <<< RED, "FORCE HIDING ALL NODES", RESET >>>;
+          for (int z; z < xmit.targets(); z++)
+          {
+            spork ~g_hidePlayer(z);
+            spork ~g_cellFadeOut(z, positions[z].x, positions[z].y, positions[z].whichEnv);
+          }
         }
       }
     }
@@ -1034,4 +1058,5 @@ spork ~timeout();
 spork ~handleClient();
 
 //listen
+<<< "ready..." >>>;
 handleAction();

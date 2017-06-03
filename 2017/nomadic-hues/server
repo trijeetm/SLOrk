@@ -7,5 +7,4 @@ function ctrl_c() {
         chuck killall-clients.ck:$VAR
 }
 
-open pdf/score.pdf
 chuck run-nameless-server.ck:$1

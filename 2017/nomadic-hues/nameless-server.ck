@@ -117,7 +117,7 @@ OscRecv recv;
 
 /************************************************************************ MIDI */
 
-1 => int device;
+3 => int device;
 // the midi event
 MidiIn min;
 // the message for retrieving data

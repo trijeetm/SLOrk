@@ -27,11 +27,11 @@ Blob[] blobs = new Blob[N_PLAYERS];
 Grid grid;
 
 void setup() {
-  size(1920, 1080, P2D);
+  //size(1280, 720, P2D);
   smooth(8);
   noStroke();
   noCursor();
-  // fullScreen(2);
+  fullScreen(2);
   colorMode(HSB, 360, 100, 100, 100);
   frameRate(60);
 

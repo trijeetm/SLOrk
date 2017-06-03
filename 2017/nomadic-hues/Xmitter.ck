@@ -34,18 +34,18 @@ public class Xmitter
       [3, 6, 8, 9, 10] @=> bassIndexes;
 
       // front
-      backing[0].setHost ( "jambalaya.local", port );
-      backing[1].setHost ( "tiramisu.local", port );
+      backing[0].setHost ( "omelet.local", port );
+      backing[1].setHost ( "lasagna.local", port );
       backing[2].setHost ( "meatloaf.local", port );
-      backing[3].setHost ( "nachos.local", port );
-      backing[4].setHost ( "lasagna.local", port );
+      backing[3].setHost ( "quinoa.local", port );
+      backing[4].setHost ( "chowder.local", port );
       // back
-      backing[5].setHost ( "chowder.local", port );
-      backing[6].setHost ( "kimchi.local", port );
+      backing[5].setHost ( "kimchi.local", port );
+      backing[6].setHost ( "nachos.local", port );
       backing[7].setHost ( "spam.local", port );
-      backing[8].setHost ( "quinoa.local", port );
-      backing[9].setHost ( "omelet.local", port );
-      backing[10].setHost ( "pho.local", port );
+      backing[8].setHost ( "hamburger.local", port );
+      backing[9].setHost ( "tiramisu.local", port );
+      backing[10].setHost ( "udon.local", port );
      // backing[11].setHost ( "gelato.local", port);
     }
   }

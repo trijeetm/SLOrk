@@ -1031,8 +1031,13 @@ initscales();
 gridinit(HIRAJOSHI);
 targetinit();
 
-//graphics
+//graphics.
+<<< CYAN, "IMPORTANT NOTE", RESET >>>;
+<<< CYAN, "initializing graphics...", RESET >>>;
+<<< RED, "processing must already be running to avoid race condition...", RESET >>>;
+<<< RED, "please wait until all of the \"OscPlug plugging class world\" messages have completed", RESET >>>;
 g_init();
+g_init(); // send a second message, just in case the first one is lost.
 
 // start listening (launch thread)
 recv.listen();
@@ -1058,5 +1063,5 @@ spork ~timeout();
 spork ~handleClient();
 
 //listen
-<<< "ready..." >>>;
+<<< GREEN, "ready...", RESET >>>;
 handleAction();

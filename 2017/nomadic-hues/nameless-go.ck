@@ -18,7 +18,7 @@ if (me.arg(0) == "")
 
 /******************************************************************** Welcome */
 
-<<< 
+<<<
 "Control Information for Players
 
  - <SPACE>             to begin / enter world
@@ -165,7 +165,7 @@ fun void network()
       if( count < 4 ) <<< ".", "" >>>;
       else if( count == 4 ) <<< "network ready...", "" >>>;
 
-      // grab the next message from the queue. 
+      // grab the next message from the queue.
       while( oe.nextMsg() != 0 )
       {
 
@@ -186,7 +186,7 @@ fun void network()
         <<< pitch, h,s,v >>>;
 
         <<< oe.getString() >>>;
-        <<< "[INFO] a:", attackMs, "d:", decayMs, "s:", sustainGain, 
+        <<< "[INFO] a:", attackMs, "d:", decayMs, "s:", sustainGain,
                    "r:", releaseMs, "tink:", numTinklers, "drn:", numDrones >>>;
 
         oe.getInt()   => attackMs;
@@ -218,7 +218,7 @@ fun void xmitHeartbeat()
 
 fun void xmitMove(int deltaX, int deltaY)
 {
-  // a message is kicked as soon as it is complete 
+  // a message is kicked as soon as it is complete
   // - type string is satisfied and bundles are closed
   xmit.startMsg("/slork/synch/move", "i i i");
   id => xmit.addInt;
@@ -272,69 +272,72 @@ fun void client()
   // infinite event loop
   while( true )
   {
+    // sync entire operation - do this before the user presses a key so
+    // that the interface has less delay.
+    clock => now; // sync entire operation
+
     // wait on event
     hi => now;
 
-    // get one or more messages
-    while( hi.recv( msg ) )
+    // get exactly one messages
+    if (hi.recv( msg ) && msg.isButtonDown())
     {
-      if (msg.isButtonDown())
+      if ((msg.which == 44) && (hasEntered == false))
       {
-        //<<< msg.which >>>;
+        <<< "YOU HAVE ENTERED THE GRID" >>>;
+        true => hasEntered;
+        xmitAction(ActionEnum.enter());
+        xmitMove(0, 0);
+        spork ~drone();
+      }
 
-        if ((msg.which == 44) && (hasEntered == false))
+      if (hasEntered == true)
+      {
+        /********************************************* Player Sound Control */
+
+        //escape, allow nodes to leave
+        if (msg.which == 41)
         {
-          <<< "YOU HAVE ENTERED THE GRID" >>>;
-          true => hasEntered;
-          xmitAction(ActionEnum.enter());
-          xmitMove(0, 0);
+          <<< "YOU HAVE DEPARTED THE GRID. PRESS SPACE TO RE-ENTER" >>>;
+          false => hasEntered; //reset to allow spacebar for reentry
+          xmitMove(0,0);
+        }
+
+        //d, rearticulate drone
+        /*
+        if (msg.which == 7)
+        {
           spork ~drone();
         }
+        */
 
-        if (hasEntered == true)
+        //j, send jump
+        if (msg.which == 13)
         {
-          /********************************************* Player Sound Control */
-
-          //escape, allow nodes to leave
-          if (msg.which == 41)
-          {
-            <<< "YOU HAVE DEPARTED THE GRID. PRESS SPACE TO RE-ENTER" >>>;
-            false => hasEntered; //reset to allow spacebar for reentry
-            xmitMove(0,0);
-          }
-
-          //d, rearticulate drone
-          /*
-          if (msg.which == 7) 
-          {
-            spork ~drone();
-          }
-          */
-
-          //j, send jump
-          if (msg.which == 13)
-          {
-            xmitAction(ActionEnum.jump());
-            spork ~jumpSound();
-          }
-
-          //number pad, send tinkle 0 - 9
-          if (msg.which >= 30 && msg.which <= 39)
-          {
-            xmitAction(ActionEnum.tinkle(), (msg.which - 29));
-            spork ~tinkleSound(msg.which - 29);
-          }
-
-          /************************************************ ARROW KEY CONTROL */
-          //up
-          if (msg.which == 82) xmitMove(1, 0);
-          //down
-          if (msg.which == 81) xmitMove(-1, 0);
-          //left
-          if (msg.which == 80) xmitMove(0, -1);
-          //right
-          if (msg.which == 79) xmitMove(0, 1);
+          xmitAction(ActionEnum.jump());
+          spork ~jumpSound();
         }
+
+        //number pad, send tinkle 0 - 9
+        if (msg.which >= 30 && msg.which <= 39)
+        {
+          xmitAction(ActionEnum.tinkle(), (msg.which - 29));
+          spork ~tinkleSound(msg.which - 29);
+        }
+
+        /************************************************ ARROW KEY CONTROL */
+        //up
+        if (msg.which == 82) xmitMove(1, 0);
+        //down
+        if (msg.which == 81) xmitMove(-1, 0);
+        //left
+        if (msg.which == 80) xmitMove(0, -1);
+        //right
+        if (msg.which == 79) xmitMove(0, 1);
+      }
+
+      while (hi.recv( msg )) {
+        <<< "dropping buffered messages -- type less!" >>>;
       }
     }
   }
@@ -358,16 +361,14 @@ fun void clockMonitor()
   //id, canstart
 
   while (true)
-  {  
+  {
       // wait for event to arrive
       ce => now;
-
       if (ce.nextMsg() != 0)
       {
         ce.getInt() => id;
         ce.getInt() => canStart;
         clock.broadcast();
-
       }
   }
 }
@@ -428,19 +429,19 @@ fun void knobMonitor()
 
 fun void adjustOsc() {
   (h $ float ) / 120 => float oscBalance;
-  if (oscBalance <= 1) 
+  if (oscBalance <= 1)
   {
     1 - oscBalance => redGain.gain;
     oscBalance     => greenGain.gain;
     0              => blueGain.gain;
-  } else if (oscBalance <= 2) 
+  } else if (oscBalance <= 2)
   {
     oscBalance - 1 => oscBalance;
 
     1 - oscBalance => greenGain.gain;
     oscBalance     => blueGain.gain;
     0              => redGain.gain;
-  } else 
+  } else
   {
     //between 2 and 3
     oscBalance - 2 => oscBalance;
@@ -548,9 +549,8 @@ fun void tinkleSound(int amount)
   for (0 => int i; i < amount; i++)
   {
     //randomize rhythm
-    for (int j; j < Math.random2(1,2); j++) clock => now;
+    for (int j; j < Math.random2(1,4); j++) clock => now;
 
-   // clock => now; //sync
     blueTinkler.noteOn(lfo.last() + 1);
     greenTinkler.noteOn(lfo.last() + 1);
     redTinkler.noteOn((lfo.last() + 1) / 2);
@@ -584,7 +584,7 @@ fun void drone()
   blueEnv => blueGain;
   greenEnv => greenGain;
   whiteEnv => whiteGain;
-  
+
   //* warm osc */
   BeeThree redOsc;
   redOsc.lfoSpeed(1);
@@ -717,7 +717,7 @@ fun void bass(int note)
   Std.mtof(note) => warm.freq => cool.freq => green.freq;
   0.16 => warm.gain => cool.gain => green.gain; //tone it down
 
-  if (HSV.isWarm(h)) 
+  if (HSV.isWarm(h))
   {
     0 => cool.gain;
     0 => green.gain;
@@ -740,7 +740,7 @@ fun void bass(int note)
   env.set(6::second, 3::second, 0.5, 3::second);
 
   env.keyOn();
-  10::second => now; 
+  10::second => now;
   env.keyOff();
 
   env.releaseTime() => now;

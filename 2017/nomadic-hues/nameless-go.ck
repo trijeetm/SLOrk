@@ -74,6 +74,7 @@ int v;
 0     => int decayMs;
 1     => float sustainGain;
 10000 => int releaseMs;
+6 => float bassAttackTime;
 
 /*
 0.1   => float coolGain;
@@ -418,6 +419,11 @@ fun void knobMonitor()
         (value $ float) / 100 => r.mix;
       }
 
+      if (which == 6)
+      {
+        (value $ float) / 10 => bassAttackTime;
+      }
+
      // tinkleGain.gain();
 
       //<<< "KNOB IN FLUX", r.mix(), globalG.gain() >>>;
@@ -737,7 +743,7 @@ fun void bass(int note)
     spork ~slewLPFcutoff(l);
   }
 
-  env.set(2::second, 3::second, 0.5, 3::second);
+  env.set(bassAttackTime::second, 3::second, 0.5, 3::second);
 
   env.keyOn();
   10::second => now;

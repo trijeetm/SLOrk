@@ -737,7 +737,7 @@ fun void bass(int note)
     spork ~slewLPFcutoff(l);
   }
 
-  env.set(6::second, 3::second, 0.5, 3::second);
+  env.set(2::second, 3::second, 0.5, 3::second);
 
   env.keyOn();
   10::second => now;

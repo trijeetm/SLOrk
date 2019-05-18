@@ -2,7 +2,7 @@ class GridCell {
   PShape cell;
   // colors
   int h, s, b;
-  float a;
+  float a = 0;
   int state = 0;
   float aIn, aOut;
 
@@ -18,7 +18,7 @@ class GridCell {
   }
 
   void setColor(int _h, int _s, int _b) {
-    h = _h; 
+    h = _h;
     s = _s;
     b = _b;
   }
@@ -30,7 +30,7 @@ class GridCell {
   void fadeIn(float t) {
     if (state == 0)
       aIn = a;
-    else 
+    else
       aIn = aOut;
 
     println("a: " + a + " " + aIn + " " + aOut);
@@ -58,19 +58,19 @@ class GridCell {
     Ani.to(this, dur, "aOut", 0, Ani.CUBIC_IN_OUT);
   }
 
+  float getA() {
+    return a;
+  }
+
   void draw() {
-    float _a;
     if (state == 1)
-      _a = aIn;
+      a = aIn;
     else if (state == -1)
-      _a = aOut;
+      a = aOut;
     else
-      _a = 0;
+      a = 0;
 
-    // if (_a != 0)
-      // println("_a: "+_a);
-
-    cell.setFill(color(h, s, b, _a));
+    cell.setFill(color(h, s, b, a));
     shape(cell);
   }
 }

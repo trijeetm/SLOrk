@@ -46,7 +46,7 @@ class Grid {
 
     int idx = (id * n * n) + (x * n) + y;
 
-    cells.get(idx).fadeIn(time / 1000.0); // convert to seconds    
+    cells.get(idx).fadeIn(time / 1000.0); // convert to seconds
   }
 
   void cellFadeOut(int id, int x, int y, int time) {
@@ -54,7 +54,7 @@ class Grid {
 
     int idx = (id * n * n) + (x * n) + y;
 
-    cells.get(idx).fadeOut(time / 1000.0); // convert to seconds    
+    cells.get(idx).fadeOut(time / 1000.0); // convert to seconds
   }
 
   void worldAlive(boolean b) {

@@ -10,7 +10,7 @@
 <<< GREEN,"running nameless-server.ck",RESET >>>;
 
 // value of clock
-100::ms => dur T;
+200::ms => dur T;
 
 // dimensions
 11 => int height;
@@ -96,6 +96,7 @@ class PlayerState {
                   //send envelopes to clients
     HSV color;
     time lastMsg;
+    int serverReceivedAtLeastOneMessage;
 }
 
 /***************************************************** Network Initialization */
@@ -117,7 +118,7 @@ OscRecv recv;
 
 /************************************************************************ MIDI */
 
-3 => int device;
+0 => int device;
 // the midi event
 MidiIn min;
 // the message for retrieving data
@@ -456,24 +457,29 @@ fun void handleClient() {
       oe.getInt() => int dY;
       oe.getInt() => int dX;
 
-      //<<< id, dY, dX >>>;
-
       //they are leaving the grid, send a fade out message
       if (dY == 0 && dX == 0
                   && grid[idToIdx(id)].who[id] == 1)
       {
+        <<< "hiding player" >>>;
         //unset occupied for old position
         0 => grid[idToIdx(id)].who[id];
-        spork ~g_hidePlayer(id);
-        spork ~g_cellFadeOut(id, positions[id].x, positions[id].y, positions[id].whichEnv);
+        g_hidePlayer(id);
+        g_cellFadeOut(id, positions[id].x, positions[id].y, positions[id].whichEnv);
         continue;
       }
 
       //unset occupied for old position
       0 => grid[idToIdx(id)].who[id];
 
-      // toggle old gridcell to fade out
-      spork ~g_cellFadeOut(id, positions[id].x, positions[id].y, positions[id].whichEnv);
+      // If we have seen the player before, fade out the previous grid cell
+      // occupied by the player.
+      if (positions[id].serverReceivedAtLeastOneMessage != 0) {
+        g_cellFadeOut(id, positions[id].x, positions[id].y, positions[id].whichEnv);
+      } else {
+        1 => positions[id].serverReceivedAtLeastOneMessage;
+      }
+
 
       0 => int didTeleport;  // to track graphics teleport
 
@@ -509,15 +515,16 @@ fun void handleClient() {
       1 => grid[idToIdx(id)].who[id];
 
       // update player graphics
-      if (didTeleport == 0)
-        spork ~g_showPlayer(id);
-      spork ~g_updatePlayer(id, didTeleport);
+      if (didTeleport == 0) {
+        g_showPlayer(id);
+      }
+      g_updatePlayer(id, didTeleport);
 
       // toggle new gridcell to fade in
-      spork ~g_cellFadeIn(id, positions[id].x, positions[id].y, positions[id].whichEnv);
+      g_cellFadeIn(id, positions[id].x, positions[id].y, positions[id].whichEnv);
 
       // update clients
-      spork ~updateClients();
+      updateClients();
     }
   }
 }
@@ -772,7 +779,7 @@ fun void g_updateWorld(int which) {
 fun void keyboard()
 {
   // the device number to open
-  0 => int deviceNum;
+  1 => int deviceNum;
 
   // instantiate a HidIn object
   HidIn hi;

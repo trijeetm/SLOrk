@@ -147,10 +147,12 @@ void updatePlayerColor(int id, int x, int y, int h, int s, int b) {
 }
 
 void cellFadeIn(int id, int x, int y, int time) {
+  println("cell fade in: " + id + " " + x + " " + y + " " + time);
   grid.cellFadeIn(id, x, y, time);
 }
 
 void cellFadeOut(int id, int x, int y, int time) {
+  println("cell fade out: " + id + x + y + time);
   grid.cellFadeOut(id, x, y, time);
 }
 

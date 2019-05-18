@@ -33,7 +33,7 @@ class Blob {
       Ani.to(this, 0.1, "alpha", 0, Ani.SINE_IN, "onEnd:appear");
     }
     else
-      Ani.to(this, 1, "x", _x);
+      Ani.to(this, 0.5, "x", _x);
   }
 
   void setY(float y, int teleport) {
@@ -44,7 +44,7 @@ class Blob {
       Ani.to(this, 0.1, "alpha", 0, Ani.SINE_IN, "onEnd:appear");
     }
     else
-      Ani.to(this, 1, "y", _y);
+      Ani.to(this, 0.5, "y", _y);
   }
 
   void appear() {
@@ -107,7 +107,7 @@ class Blob {
       return;
 
     // println(x);
-    
+
     fill(color(0, 0, 100, 20 * (alpha / 100)));
     ellipse(x, y, radius * (1 + halo), radius * (1 + halo));
     fill(col, alpha);

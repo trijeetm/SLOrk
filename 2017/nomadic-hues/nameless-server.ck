@@ -10,7 +10,7 @@
 <<< GREEN,"running nameless-server.ck",RESET >>>;
 
 // value of clock
-200::ms => dur T;
+100::ms => dur T;
 
 // dimensions
 11 => int height;

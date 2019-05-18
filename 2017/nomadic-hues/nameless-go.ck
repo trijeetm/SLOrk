@@ -273,12 +273,12 @@ fun void client()
   // infinite event loop
   while( true )
   {
+    // wait on event
+    hi => now;
+
     // sync entire operation - do this before the user presses a key so
     // that the interface has less delay.
     clock => now; // sync entire operation
-
-    // wait on event
-    hi => now;
 
     // get exactly one messages
     if (hi.recv( msg ) && msg.isButtonDown())
@@ -337,9 +337,12 @@ fun void client()
         if (msg.which == 79) xmitMove(0, 1);
       }
 
-      while (hi.recv( msg )) {
-        <<< "dropping buffered messages -- type less!" >>>;
-      }
+      // allow the clients to accumulate a buffer of messages.
+      //
+      // the messages will be dropped at the clock rate.
+      // while (hi.recv( msg )) {
+      //   <<< "dropping buffered messages -- type less!" >>>;
+      // }
     }
   }
 }
@@ -641,7 +644,7 @@ fun void drone()
   1 => greenOsc.noteOn;
 
   //sync!
-  clock => now;
+  //clock => now;
 
   redEnv.keyOn();
   blueEnv.keyOn();

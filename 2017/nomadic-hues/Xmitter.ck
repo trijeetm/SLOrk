@@ -30,14 +30,14 @@ public class Xmitter
     {
       <<< "Initializing Xmitter for non-local" >>>;
 
-      1 => NUM_BASS;
-      1 => num_targets;
-      [0] @=> bassIndexes;
+      2 => NUM_BASS;
+      2 => num_targets;
+      [0,1] @=> bassIndexes;
 
       // front
       backing[0].setHost ( "chowder.local", port );
       // backing[1].setHost ( "hamburger.local", port );
-      // backing[2].setHost ( "donut.local", port );
+      backing[1].setHost ( "donut.local", port );
      // backing[11].setHost ( "gelato.local", port);
     }
   }

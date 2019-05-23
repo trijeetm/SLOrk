@@ -484,6 +484,8 @@ fun void adjustLPF()
 fun void jumpSound() {
   ModalBar inst => LPF lpf => NRev rev => globalG;
 
+  Math.random2f(0.1, 0.5) => inst.gain;
+
   Sample kick;
   kick.init("Kick7.wav");
   kick.getBuff() => rev;
@@ -493,7 +495,7 @@ fun void jumpSound() {
 
   clock => now;
 
-  kick.playWithJitter(0.3, 1);
+  kick.playWithJitter(0.5, 1);
 
   12 => int offset;
   //if (pitch - offset < 36) 0 => offset;

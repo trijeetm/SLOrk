@@ -11,9 +11,9 @@ OscP5 oscP5;
 Colors colors = new Colors();
 
 // update variables as per world
-int N_PLAYERS = 11;
-int WIDTH = 11;
-int HEIGHT = 11;
+int N_PLAYERS = 10;
+int WIDTH = 10;
+int HEIGHT = 10;
 
 float WORLD_SIZE = 960;
 float CELL_SIZE = WORLD_SIZE / WIDTH;

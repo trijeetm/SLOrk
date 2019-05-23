@@ -13,8 +13,8 @@
 100::ms => dur T;
 
 // dimensions
-11 => int height;
-11 => int width;
+10 => int height;
+10 => int width;
 
 //if nonzero, server has indicated it is safe to begin.
 0 => int pieceIsActive;
@@ -125,7 +125,7 @@ MidiIn min;
 MidiMsg msg;
 
 // open the device
-if( !min.open( device ) ) me.exit();
+/* if( !min.open( device ) ) me.exit(); */
 
 // print out device that was opened
 <<< YELLOW, "MIDI device:", min.num(), " -> ", min.name(), RESET >>>;

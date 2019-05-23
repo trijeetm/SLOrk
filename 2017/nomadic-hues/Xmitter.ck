@@ -7,11 +7,11 @@ public class Xmitter
   // port
   6449 => int port;
 
-  5 => int NUM_BASS;
+  11 => int NUM_BASS;
   int bassIndexes[NUM_BASS];
 
-  5 => int NUM_IN_FRONT;
-  6 => int NUM_IN_BACK;
+  6 => int NUM_IN_FRONT;
+  5 => int NUM_IN_BACK;
 
   fun void init(string arg)
   {
@@ -30,15 +30,28 @@ public class Xmitter
     {
       <<< "Initializing Xmitter for non-local" >>>;
 
-      2 => NUM_BASS;
-      2 => num_targets;
-      [0,1] @=> bassIndexes;
+      10 => NUM_BASS;
+      10 => num_targets;
+      [0,1,2,3,4,5,6,7,8,9] @=> bassIndexes;
+
+      5 => NUM_IN_FRONT;
+      5 => NUM_IN_BACK;
 
       // front
-      backing[0].setHost ( "chowder.local", port );
-      // backing[1].setHost ( "hamburger.local", port );
-      backing[1].setHost ( "donut.local", port );
-     // backing[11].setHost ( "gelato.local", port);
+      backing[0].setHost ( "nachos.local", port );
+      backing[1].setHost ( "omelet.local", port );
+      backing[2].setHost ( "lasagna.local", port );
+      backing[3].setHost ( "foiegras.local", port );
+      backing[4].setHost ( "spam.local", port );
+      backing[5].setHost ( "udon.local", port );
+
+      // back
+      backing[6].setHost ( "empanada.local", port);
+      backing[7].setHost ( "icetea.local", port);
+
+      backing[8].setHost ( "pho.local", port);
+      backing[9].setHost ( "quinoa.local", port);
+      // backing[8].setHost ( "meatloaf.local", port);
     }
   }
 

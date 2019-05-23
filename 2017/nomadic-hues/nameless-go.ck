@@ -250,7 +250,7 @@ fun void client()
 {
 
   // the device number to open
-  0 => int deviceNum;
+  1 => int deviceNum;
 
   // instantiate a HidIn object
   HidIn hi;
@@ -484,6 +484,8 @@ fun void adjustLPF()
 fun void jumpSound() {
   ModalBar inst => LPF lpf => NRev rev => globalG;
 
+  Math.random2f(0.1, 0.5) => inst.gain;
+
   Sample kick;
   kick.init("Kick7.wav");
   kick.getBuff() => rev;
@@ -491,9 +493,10 @@ fun void jumpSound() {
   lpf.freq(2000);
   0.05 => rev.mix;
 
-  clock => now;
+  /* clock => now; */
+  // don't do this, parent function does it
 
-  kick.playWithJitter(0.3, 1);
+  kick.playWithJitter(0.5, 1);
 
   12 => int offset;
   //if (pitch - offset < 36) 0 => offset;
@@ -557,9 +560,6 @@ fun void tinkleSound(int amount)
   //amount bounded between 0 and 9
   for (0 => int i; i < amount; i++)
   {
-    //randomize rhythm
-    for (int j; j < Math.random2(1,4); j++) clock => now;
-
     blueTinkler.noteOn(lfo.last() + 1);
     greenTinkler.noteOn(lfo.last() + 1);
     redTinkler.noteOn((lfo.last() + 1) / 2);
@@ -570,6 +570,10 @@ fun void tinkleSound(int amount)
     greenTinkler.noteOff(1);
     blueTinkler.noteOff(1);
 
+    //randomize rhythm
+    for (int j; j < Math.random2(1,4); j++) {
+      clock => now;
+    };
   }
 
   //let die
@@ -638,13 +642,14 @@ fun void drone()
   greenEnv.set(attackMs::ms, decayMs::ms, sustainGain, releaseMs::ms);
   whiteEnv.set(attackMs::ms, decayMs::ms, sustainGain, releaseMs::ms);
 
-    /* Patch */
+  /* Patch */
   1 => redOsc.noteOn;
   1 => blueOsc.noteOn;
   1 => greenOsc.noteOn;
 
   //sync!
-  //clock => now;
+  /* clock => now; */
+  // don't do this, parent function does it
 
   redEnv.keyOn();
   blueEnv.keyOn();

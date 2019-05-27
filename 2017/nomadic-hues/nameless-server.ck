@@ -649,7 +649,7 @@ fun void slewColors(int hue) {
 false => int GRAPHICS_VERBOSE;
 
 fun void g_init() {
-  if (GRAPHICS_VERBOSE) <<< "g_init" >>>;
+  if (GRAPHICS_VERBOSE) <<< "g_init: " + width + " " + height >>>;
 
   graphicsXmit.startMsg("/nameless/graphics/init", "i i i");
   xmit.targets() => graphicsXmit.addInt;
@@ -658,13 +658,13 @@ fun void g_init() {
 }
 
 fun void g_showPlayer(int id) {
-  if (GRAPHICS_VERBOSE) <<< "g_showPlayer" >>>;
+  if (GRAPHICS_VERBOSE) <<< "g_showPlayer:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/enter", "i");
   id => graphicsXmit.addInt;
 }
 
 fun void g_hidePlayer(int id) {
-  if (GRAPHICS_VERBOSE)  <<< "g_hidePlayer" >>>;
+  if (GRAPHICS_VERBOSE)  <<< "g_hidePlayer:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/exit", "i");
   id => graphicsXmit.addInt;
 }

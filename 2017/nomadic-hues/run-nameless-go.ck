@@ -4,4 +4,4 @@ Machine.add("class.sample.ck");
 <<< "Adding sample class" >>>;
 Machine.add("ActionEnum.ck");
 <<< "Adding ActionEnum.ck" >>>;
-Machine.add("nameless-go.ck:" + me.arg(0));
+Machine.add("nameless-go.ck:" + me.arg(0) + ":" + me.arg(1));

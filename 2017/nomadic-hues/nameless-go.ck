@@ -88,10 +88,10 @@ Event clock;
 // create our OSC receiver
 OscRecv recv;
 // use port 6449
-6449 => recv.port;
+me.arg(1).toInt() => recv.port;
 // start listening (launch thread)
 recv.listen();
-<<< "OscRecv: listening on 6449" >>>;
+<<< "OscRecv: listening on " + me.arg(1)>>>;
 
 // osc handle for server
 OscSend xmit;
@@ -250,7 +250,7 @@ fun void client()
 {
 
   // the device number to open
-  0 => int deviceNum;
+  1 => int deviceNum;
 
   // instantiate a HidIn object
   HidIn hi;

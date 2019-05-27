@@ -731,7 +731,7 @@ fun void g_playerJump(int id) {
 }
 
 fun void g_updateColor(int id) {
-  if (GRAPHICS_VERBOSE)  <<< "g_updateColor" + id >>>;
+  if (GRAPHICS_VERBOSE)  <<< "g_updateColor:" + id >>>;
 
   graphicsXmit.startMsg("/nameless/graphics/player/color", "i i i i i i");
   id => graphicsXmit.addInt;

@@ -2,15 +2,18 @@ class GridCell {
   PShape cell;
   // colors
   int h, s, b;
-  float a = 0;
-  int state = 0;
+  float a;
+  int state;
   float aIn, aOut;
 
   GridCell(float _x, float _y, float size) {
-    // h = 360;
-    // s = 100;
-    // b = 100;
-    // a = 50;
+    // initialize the grid cell HSB values - for some reason if we do not
+    // do things do not work.
+    h = 360;
+    s = 100;
+    b = 100;
+    a = 0;
+    state = 0;
 
     cell = createShape(RECT, _x, _y, size, -size);
     cell.setStroke(false);

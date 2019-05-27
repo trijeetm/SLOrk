@@ -37,6 +37,7 @@ class Grid {
 
   void updateCell(int id, int x, int y, int h, int s, int b) {
     int idx = (id * n * n) + (x * n) + y;
+    println("update cell: " + id + " " + x + " " + y + " " + h + " " + s + " " + b);
 
     cells.get(idx).setColor(h, s, b);
   }

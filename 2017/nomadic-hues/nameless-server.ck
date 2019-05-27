@@ -646,7 +646,11 @@ fun void slewColors(int hue) {
 
 /************************************************************************* Graphics */
 
+false => int GRAPHICS_VERBOSE;
+
 fun void g_init() {
+  if (GRAPHICS_VERBOSE) <<< "g_init: " + width + " " + height >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/init", "i i i");
   xmit.targets() => graphicsXmit.addInt;
   width => graphicsXmit.addInt;
@@ -654,16 +658,20 @@ fun void g_init() {
 }
 
 fun void g_showPlayer(int id) {
+  if (GRAPHICS_VERBOSE) <<< "g_showPlayer:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/enter", "i");
   id => graphicsXmit.addInt;
 }
 
 fun void g_hidePlayer(int id) {
+  if (GRAPHICS_VERBOSE)  <<< "g_hidePlayer:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/exit", "i");
   id => graphicsXmit.addInt;
 }
 
 fun void g_updatePlayer(int id) {
+  if (GRAPHICS_VERBOSE) <<< "g_updatePlayer:" + id >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/player/move", "i i i i i i i");
   id => graphicsXmit.addInt;
   positions[id].x => graphicsXmit.addInt;
@@ -675,6 +683,7 @@ fun void g_updatePlayer(int id) {
 }
 
 fun void g_updatePlayer(int id, int didTeleport) {
+  if (GRAPHICS_VERBOSE) <<< "g_updatePlayer:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/move", "i i i i i i i");
   id => graphicsXmit.addInt;
   positions[id].x => graphicsXmit.addInt;
@@ -686,6 +695,8 @@ fun void g_updatePlayer(int id, int didTeleport) {
 }
 
 fun void g_cellFadeIn(int id, int x, int y, int env) {
+  if (GRAPHICS_VERBOSE) <<< "g_cellFadeIn:" + id + " " + x + " " + y + " " + env >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/cell/fadeIn", "i i i i");
 
   id                  => graphicsXmit.addInt;
@@ -695,6 +706,8 @@ fun void g_cellFadeIn(int id, int x, int y, int env) {
 }
 
 fun void g_cellFadeOut(int id, int x, int y, int env) {
+  if (GRAPHICS_VERBOSE) <<< "g_cellFadeOut:" + id + " " + x + " " + y + " " + env >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/cell/fadeOut", "i i i i");
 
   id                  => graphicsXmit.addInt;
@@ -704,17 +717,22 @@ fun void g_cellFadeOut(int id, int x, int y, int env) {
 }
 
 fun void g_playerTinkle(int id, int tinkles) {
+  if (GRAPHICS_VERBOSE)  <<< "g_playerTinkle:" + id + " " + tinkles >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/player/tinkle", "i i");
   id => graphicsXmit.addInt;
   tinkles => graphicsXmit.addInt;
 }
 
 fun void g_playerJump(int id) {
+    if (GRAPHICS_VERBOSE)  <<< "g_playerJump:" + id >>>;
   graphicsXmit.startMsg("/nameless/graphics/player/jump", "i");
   id => graphicsXmit.addInt;
 }
 
 fun void g_updateColor(int id) {
+  if (GRAPHICS_VERBOSE)  <<< "g_updateColor:" + id >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/player/color", "i i i i i i");
   id => graphicsXmit.addInt;
   positions[id].x => graphicsXmit.addInt;

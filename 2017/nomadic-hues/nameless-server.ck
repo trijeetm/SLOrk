@@ -19,6 +19,9 @@
 //if nonzero, server has indicated it is safe to begin.
 0 => int pieceIsActive;
 
+// movement number tracker (for gfx)
+0 => int movementNumber;
+
 100 => int globalSaturation;
 
 [10000, 5,    400,  50 ] @=> int attackMs[];
@@ -725,7 +728,8 @@ fun void g_playerTinkle(int id, int tinkles) {
 }
 
 fun void g_playerJump(int id) {
-    if (GRAPHICS_VERBOSE)  <<< "g_playerJump:" + id >>>;
+  if (GRAPHICS_VERBOSE)  <<< "g_playerJump:" + id >>>;
+
   graphicsXmit.startMsg("/nameless/graphics/player/jump", "i");
   id => graphicsXmit.addInt;
 }
@@ -820,7 +824,21 @@ fun void keyboard()
     {
       if (msg.isButtonDown())
       {
-        //<<< msg.which >>>;
+        /* <<< msg.which >>>; */
+
+        // -
+        if (msg.which == 45) {
+          movementNumber--;
+          graphicsXmit.startMsg("/nameless/graphics/movement", "i");
+          movementNumber => graphicsXmit.addInt;
+        }
+
+        // =
+        if (msg.which == 46) {
+          movementNumber++;
+          graphicsXmit.startMsg("/nameless/graphics/movement", "i");
+          movementNumber => graphicsXmit.addInt;
+        }
 
         //r
         if (msg.which == 21)

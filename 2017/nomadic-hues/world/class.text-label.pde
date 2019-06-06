@@ -20,11 +20,14 @@ class TextLabel {
   }
 
   void fadeLabelIn() {
+    yPos = 940;
     Ani.to(this, 1, "alpha", 100, Ani.EXPO_IN_OUT, "onEnd:fadeLabelOut");
+    Ani.to(this, 1, "yPos", 920);
   }
 
   void fadeLabelOut() {
-    Ani.to(this, 1, 10, "alpha", 0);
+    Ani.to(this, 1, 5, "alpha", 0);
+    Ani.to(this, 1, 5, "yPos", 900);
   }
 
   void draw() {

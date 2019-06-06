@@ -37,19 +37,19 @@ public class Xmitter
       5 => NUM_IN_FRONT;
       5 => NUM_IN_BACK;
 
-      // front
-      backing[0].setHost ( "nachos.local", port );
+      // left
+      backing[0].setHost ( "lasagna.local", port );
       backing[1].setHost ( "omelet.local", port );
-      backing[2].setHost ( "lasagna.local", port );
-      backing[3].setHost ( "foiegras.local", port );
-      backing[4].setHost ( "spam.local", port );
+      backing[2].setHost ( "pho.local", port );
+      backing[3].setHost ( "empanada.local", port );
+      backing[4].setHost ( "meatloaf.local", port );
 
-      // back
-      backing[5].setHost ( "udon.local", port );
-      backing[6].setHost ( "empanada.local", port );
-      backing[7].setHost ( "icetea.local", port );
-      backing[8].setHost ( "pho.local", port );
-      backing[9].setHost ( "quinoa.local", port );
+      // right
+      backing[5].setHost ( "quinoa.local", port );
+      backing[6].setHost ( "nachos.local", port );
+      backing[7].setHost ( "foiegras.local", port );
+      backing[8].setHost ( "udon.local", port );
+      backing[9].setHost ( "chowder.local", port );
     }
   }
 

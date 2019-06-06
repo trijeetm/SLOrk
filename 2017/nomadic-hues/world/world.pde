@@ -29,7 +29,7 @@ Grid grid;
 // text labels
 // STEP 1 Declare PFont variable
 PFont _fontLabel;
-TextLabel movementLabels = new TextLabel();
+TextLabel movementLabel = new TextLabel();
 
 void setup() {
   //size(1280, 720, P2D);
@@ -82,7 +82,7 @@ void draw() {
         blob.draw();
     }
 
-  movementLabels.draw();
+  movementLabel.draw();
 }
 
 void initWorld() {
@@ -170,7 +170,7 @@ void showMovementLabel(int mvt) {
   if ((mvt > 0) && (mvt <= 12)) {
     println("Displaying label for movement:", mvt);
 
-    String mvtLabel;
+    String mvtLabel = "";
 
     switch(mvt) {
       case 1:
@@ -210,6 +210,8 @@ void showMovementLabel(int mvt) {
         mvtLabel = "XII. dust";
         break;
     }
+
+    movementLabel.displayLabel(mvtLabel);
   }
 }
 

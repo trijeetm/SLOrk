@@ -1,4 +1,4 @@
-class TextLabel\ {
+class TextLabel {
   float alpha = 0;
   String txt = "";
 
@@ -20,12 +20,10 @@ class TextLabel\ {
   }
 
   void fadeLabelIn() {
-    println("fading in");
     Ani.to(this, 1, "alpha", 100, Ani.EXPO_IN_OUT, "onEnd:fadeLabelOut");
   }
 
   void fadeLabelOut() {
-    println("fading out");
     Ani.to(this, 1, 10, "alpha", 0);
   }
 

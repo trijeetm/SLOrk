@@ -26,6 +26,11 @@ float worldB = 0;
 Blob[] blobs = new Blob[N_PLAYERS];
 Grid grid;
 
+// text labels
+// STEP 1 Declare PFont variable
+PFont _fontLabel;
+TextLabel movementLabels = new TextLabel();
+
 void setup() {
   //size(1280, 720, P2D);
   smooth(8);
@@ -34,6 +39,8 @@ void setup() {
   fullScreen(2);
   colorMode(HSB, 360, 100, 100, 100);
   frameRate(60);
+
+  _fontLabel = createFont("Calluna", 48, true);
 
   Ani.init(this);
 
@@ -59,6 +66,7 @@ void setup() {
   oscP5.plug(this, "hidePlayer", "/nameless/graphics/player/exit");
   oscP5.plug(this, "cellFadeIn", "/nameless/graphics/cell/fadeIn");
   oscP5.plug(this, "cellFadeOut", "/nameless/graphics/cell/fadeOut");
+  oscP5.plug(this, "showMovementLabel", "/nameless/graphics/movement");
 }
 
 void draw() {
@@ -73,6 +81,8 @@ void draw() {
       if (blob != null)
         blob.draw();
     }
+
+  movementLabels.draw();
 }
 
 void initWorld() {
@@ -154,6 +164,53 @@ void cellFadeIn(int id, int x, int y, int time) {
 void cellFadeOut(int id, int x, int y, int time) {
   println("cell fade out: " + id + x + y + time);
   grid.cellFadeOut(id, x, y, time);
+}
+
+void showMovementLabel(int mvt) {
+  if ((mvt > 0) && (mvt <= 12)) {
+    println("Displaying label for movement:", mvt);
+
+    String mvtLabel;
+
+    switch(mvt) {
+      case 1:
+        mvtLabel = "I. discovery";
+        break;
+      case 2:
+        mvtLabel = "II. settle";
+        break;
+      case 3:
+        mvtLabel = "III. strangers";
+        break;
+      case 4:
+        mvtLabel = "IV. kinship";
+        break;
+      case 5:
+        mvtLabel = "V. opportunism";
+        break;
+      case 6:
+        mvtLabel = "VI. chaos";
+        break;
+      case 7:
+        mvtLabel = "VII. glitch";
+        break;
+      case 8:
+        mvtLabel = "VIII. rebirth";
+        break;
+      case 9:
+        mvtLabel = "IX. bustle";
+        break;
+      case 10:
+        mvtLabel = "X. rain";
+        break;
+      case 11:
+        mvtLabel = "XI. civilization";
+        break;
+      case 12:
+        mvtLabel = "XII. dust";
+        break;
+    }
+  }
 }
 
 /* incoming osc message are forwarded to the oscEvent method. */

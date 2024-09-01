@@ -7,7 +7,9 @@ TODOs:
 
 --------------------------------------------------------------------------------
 
-To run server:
+## To run the piece
+
+**To run server:**
 
 chuck run-nameless-server.ck:(local)
 processing-java --sketch=`pwd`/world --run
@@ -15,9 +17,7 @@ processing-java --sketch=`pwd`/world --run
 dependencies: oscP5 and Ani (move folders to processing's sketchbook)
 if local is not specified, initializes clients as listed in the source.
 
---------------------------------------------------------------------------------
-
-To run local:
+**To run locally (for testing purposes):**
 
 chuck run-nameless-go.ck:(name of server)
 
@@ -25,28 +25,34 @@ if name of server is not specified, assumed to be localhost.
 
 --------------------------------------------------------------------------------
 
-CLIENT KEYMAP
+### CLIENT KEYMAP
  - <SPACE>             to begin / enter world
  - ^v<> keys           to navigate world
  - d                   to rearticulate drone (on your current position)
  - 1-0                 to 'tinkle' (clocked by server)
  - j                   to 'jump' (clocked by server)
 
-SERVER KEYMAP
+### SERVER KEYMAP
+
+**Color selector**
+_This changes the color of the performer dots. It also sets the timbre of the performers._
  - g                   to slew to random g
  - b                   to slew to random b
  - r                   to slew to random r
  - y                   <not implemented>
 
+**Scale selector**
  - p                   to use pentatonic scale
  - h                   to use hirajoshi scale
- - a                   to use aminor
- - d                   to use dminor
+ - a                   to use aminor scale
+ - d                   to use dminor scale
+ - z                   to use ascending scale
 
- - x                   to fork bass on clients who have subs
- 
+ **Envelope selector**
  - 1234                to set ADSR presets on all clients
-                       corresponds to sections of the piece 
+                       corresponds to sections of the piece
+   
+ - x                   to fork bass on clients who have subs
 
  GESTURES
  - RAIN:     everyone drift downwards

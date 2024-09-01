@@ -1,15 +1,9 @@
-NOTES:
-
-add score
-density
-absense and presense
-formations
-
---------------------------------------------------------------------------------
-
-nameless Trijeet.local
-
-motu -25
+TODOs:
+[] update README
+    - re-write keymap
+    - add documentation on Xmitter.ck
+[] cleanup references to NUM_IN_FRONT, etc
+[] add additional notes to score
 
 --------------------------------------------------------------------------------
 
@@ -30,12 +24,6 @@ chuck run-nameless-go.ck:(name of server)
 if name of server is not specified, assumed to be localhost.
 
 --------------------------------------------------------------------------------
-
-To do:
-- server ability to change color of client
-- client needs to have a color map
-  - more sound sources
-- nathan slew color on server
 
 CLIENT KEYMAP
  - <SPACE>             to begin / enter world
@@ -66,3 +54,9 @@ SERVER KEYMAP
  - TINKLE:   numbers 1-0 control number of tinkles (can strike successively)
  - JUMP:     percussive effect
  - DRIFT:    find a place sonically pleasing
+
+--------------------------------------------------------------------------------
+
+### Performance notes for SLOrk setup 
+nameless Trijeet.local
+motu -25

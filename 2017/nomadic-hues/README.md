@@ -26,8 +26,9 @@ if name of server is not specified, assumed to be localhost.
 --------------------------------------------------------------------------------
 
 ### CLIENT KEYMAP
+
  - <SPACE>             to begin / enter world
- - ^v<> keys           to navigate world
+ - arrow keys          to navigate world
  - d                   to rearticulate drone (on your current position)
  - 1-0                 to 'tinkle' (clocked by server)
  - j                   to 'jump' (clocked by server)

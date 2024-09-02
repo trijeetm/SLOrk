@@ -37,14 +37,14 @@ public class Xmitter
       5 => NUM_IN_FRONT;
       5 => NUM_IN_BACK;
 
-      // left
+      // front section machines
       backing[0].setHost ( "lasagna.local", port );
       backing[1].setHost ( "omelet.local", port );
       backing[2].setHost ( "pho.local", port );
       backing[3].setHost ( "empanada.local", port );
       backing[4].setHost ( "meatloaf.local", port );
 
-      // right
+      // back section machines
       backing[5].setHost ( "quinoa.local", port );
       backing[6].setHost ( "nachos.local", port );
       backing[7].setHost ( "foiegras.local", port );

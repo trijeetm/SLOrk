@@ -1,9 +1,9 @@
 TODOs:
-[] update README
-    - re-write keymap
-    - add documentation on Xmitter.ck
-[] cleanup references to NUM_IN_FRONT, etc
-[] add additional notes to score
+- [ ] update README
+    - [ ] re-write keymap
+    - [ ] add documentation on Xmitter.ck
+- [ ] cleanup references to NUM_IN_FRONT, etc
+- [ ] add additional notes to score
 
 --------------------------------------------------------------------------------
 

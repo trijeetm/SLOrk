@@ -4,8 +4,8 @@ TODOs:
     - [ ] add documentation on Xmitter.ck
 - [ ] cleanup references to NUM_IN_FRONT, etc
 - [ ] add additional notes to score
+- [ ] document MIDI controller commands
 
---------------------------------------------------------------------------------
 
 ## To run the piece
 
@@ -23,7 +23,8 @@ chuck run-nameless-go.ck:(name of server)
 
 if name of server is not specified, assumed to be localhost.
 
---------------------------------------------------------------------------------
+
+## Controls
 
 ### CLIENT KEYMAP
 
@@ -40,7 +41,7 @@ _This changes the color of the performer dots. It also sets the timbre of the pe
  - g                   to slew to random g
  - b                   to slew to random b
  - r                   to slew to random r
- - y                   <not implemented>
+
 
 **Scale selector**
  - p                   to use pentatonic scale
@@ -48,22 +49,22 @@ _This changes the color of the performer dots. It also sets the timbre of the pe
  - a                   to use aminor scale
  - d                   to use dminor scale
  - z                   to use ascending scale
+ - y                   to use "yo" scale
 
  **Envelope selector**
- - 1234                to set ADSR presets on all clients
-                       corresponds to sections of the piece
-   
- - x                   to fork bass on clients who have subs
+ - 1, 2, 3, 4          to set ADSR presets on all clients in the "front" section
+ - 7, 8, 9, 0          to set ADSR presets on all clients in the to "back" section
 
- GESTURES
+
+## Musical gestures
+_See score for details, and how it fits into the piece_
+
  - RAIN:     everyone drift downwards
  - ARP:      everyone drift to the right
  - TINKLE:   numbers 1-0 control number of tinkles (can strike successively)
  - JUMP:     percussive effect
  - DRIFT:    find a place sonically pleasing
 
---------------------------------------------------------------------------------
-
-### Performance notes for SLOrk setup 
+## Performance notes for SLOrk setup 
 nameless Trijeet.local
 motu -25

@@ -875,7 +875,7 @@ fun void keyboard()
           spork ~gridinit(PENTATONIC);
         }
 
-        //p
+        //h
         if (msg.which == HIRAJOSHI)
         {
           //shift to hirajoshi scale
